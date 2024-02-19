@@ -9,6 +9,7 @@ output: pdf_document
 
 ```{r}
 print("ccqqsitdakilasuuuuuuuuuuuuuuuudq d")
+print("ccqsdq issssouuuuuuuuuu")
 ```
 
 qssqezrzerd jeozirx .

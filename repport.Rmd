@@ -8,7 +8,7 @@ output: pdf_document
 # cc
 
 ```{r}
-print("ccqsdqsdq sd")
+print("ccqsdq issssouuuuuuuuuu")
 ```
 
-qssqd je veux .
+qqd je vezifueux .

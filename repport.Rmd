@@ -8,8 +8,7 @@ output: pdf_document
 # cc
 
 ```{r}
-print("ccqqsitdakilasuuuuuuuuuuuuuuuudq d")
 print("ccqsdq issssouuuuuuuuuu")
 ```
 
-qssqezrzerd jeozirx .
+qqd je vezifueux .

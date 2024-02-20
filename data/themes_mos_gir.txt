@@ -1,0 +1,17 @@
+ID	MOS	Col
+1	Végétation arborée - Caducs	forestgreen
+2	Végétation arborée - Persistants	darkgreen
+3	Vegetation (bois) urbaine	darkseagreen
+4	Pelouses et gazons	limegreen
+5	Prairies	darkolivegreen1
+6	Cultures	darkgoldenrod1
+7	Vergers	firebrick1
+8	Vignes	darkmagenta
+9	Friches	chocolate1
+10	Réseau hydrique	deepskyblue
+11	Surfaces artificialisées	gray
+12	Ombres	black
+13	Friches végétales	yellow3
+14	Friches non végétales	wheat1
+
+

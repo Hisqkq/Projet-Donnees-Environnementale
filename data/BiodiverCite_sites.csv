@@ -1,0 +1,54 @@
+;code_site;name_site;Nom_lieu;year2018;year2019;year2022;year2023;Statut;Taxons
+1;E4205N64140;Villenave-A;Courréjean;1;1;1;1;Perenne;Tous
+2;E4135N64325;Blanquefort-A;Le Neurin;1;1;1;1;Perenne;Tous
+3;E4225N64340;Ambarès-et-Lagrave-A;Montferrand;1;1;0;0;Flottante;Tous
+4;E4000N64290;Saint-Médard-A;Lagunasse;1;1;1;1;Perenne;Tous
+5;E4235N64240;Artigues-près-Bordeaux;Desclaux;1;1;1;1;Perenne;Tous
+6;E4115N64320;Blanquefort-B;Tanaïs;1;0;0;0;Flottante;Tous
+7;E4065N64165;Pessac-A;Centre équestre;1;1;1;1;Perenne;Tous
+8;E4215N64390;Ambès-A;Cantefrêne;1;1;0;0;Flottante;Tous
+9;E4180N64125;Villenave-B;Couhins;1;1;1;1;Perenne;Tous
+10;E4120N64290;Blanquefort-C;Majolan;1;1;1;1;Perenne;Tous
+11;E4030N64350;Saint-Aubin-A;Segonnes;1;1;0;0;Flottante;Tous
+12;E4120N64135;Gradignan-A;Moulin d’Ornon;1;1;1;1;Perenne;Tous
+13;E4225N64375;Ambarès-et-Lagrave-B;Petit Marais;1;1;1;1;Perenne;Tous
+14;E4025N64235;Martignas-sur-Jalle;Hestigeac;1;1;1;1;Perenne;Tous
+15;E4130N64215;Mérignac;Bourran;1;0;1;1;Perenne;Tous
+16;E4250N64350;Ambarès-et-Lagrave-C;Grand Marais;1;1;1;1;Perenne;Tous
+17;E4240N64185;Bouliac-A;Rouqueys;1;0;0;0;Flottante;Tous
+18;E4045N64355;Saint-Aubin-B;Lagune Guitoune;1;0;0;0;Flottante;Tous
+19;E4190N64415;Ambès-B;Ball Trap;1;1;1;1;Perenne;Tous
+20;E4175N64430;Ambès-C;Le Bec;1;0;0;0;Flottante;Tous
+21;E4090N64185;Pessac-B;Bourgailh;1;1;1;1;Perenne;Tous
+22;E4185N64160;Bègles;Mussonville;1;1;1;1;Perenne;Tous
+23;E4135N64135;Gradignan-B;Tauzia;1;0;0;0;Flottante;Tous
+24;E4215N64185;Bouliac-B;Rocade sortie 22;1;0;0;0;Flottante;Tous
+25;E4255N64340;Ambarès-et-Lagrave-D;Artigue-Martin;1;1;0;0;Flottante;Tous
+26;E4015N64305;Saint-Médard-B;Lagune Plate;0;1;0;0;Flottante;Tous
+27;E4050N64355;Saint-Aubin-C;Mautemps-Ouest;0;0;0;0;Flottante;Tous
+28;E4050N64350;Saint-Aubin-D;Mautemps;0;1;1;1;Perenne;Tous
+29;E4235N64185;Bouliac-C;Vergnes;0;1;1;1;Perenne;Tous
+30;E4265N64330;Saint-Vincent de Paul;La Conteste;0;1;0;0;Flottante;Tous
+31;E4145N64140;Gradignan-C;Mandavit;0;1;1;1;Perenne;Tous
+32;E4160N64325;Parempuyre-A;Chateau Pichon;0;1;0;0;Flottante;Tous
+33;E4000N64315;Saint-Médard-C;Lagune Berle Neuve;0;1;0;0;Flottante;Tous
+34;E4185N64225;Bordeaux-A;Jardin Bota;0;0;1;1;Perenne;Tous
+35;E4145N64335;Parempuyre-B;Etang gare;0;0;1;0;Flottante;Tous
+36;E4035N64270;Saint-Médard-D;Ruisseau du Guitard;0;0;1;0;Flottante;Tous
+37;E4085N64200;Mérignac-B;Plaine loisirs Beutre;0;0;1;0;Flottante;Tous
+38;E4155N64165;Talence-A;Thouars;0;0;1;0;Flottante;Odonates
+39;E4160N64150;Villenave-C;Parc Tannerie (Gradignan);0;0;1;0;Flottante;Odonates
+40;E4150N64235;Bordeaux-B;Parc Bordelais;0;0;1;1;Perenne;Tous
+41;E4210N64210;Floirac;Observatoire Université;0;0;1;0;Flottante;Oiseaux, Papillons
+42;E4145N64185;Talence-B;Mutualiste;0;0;1;0;Flottante;Oiseaux, Papillons, Amphibiens, Reptiles
+43;E4170N64345;Parempuyre-C;Olives;0;0;0;1;Flottante;Tous
+44;E4140N64335;Blanquefort-D;Doyen Bel Air;0;0;0;1;Flottante;Oiseaux, Papillons
+45;E4180N64130;Villenave-C;Chateau Trigant;0;0;0;1;Flottante;Oiseaux, Papillons
+46;E4170N64185;Talence-B;Le Voltaire;0;0;0;1;Flottante;Oiseaux, Papillons
+47;E4155N64140;Gradignan-D;Francois Xavier;0;0;0;1;Flottante;Oiseaux, Papillons
+48;E4200N64180;Bègles;Plage Nord;0;0;0;1;Flottante;Odonates, Amphibiens, Reptiles
+49;E4210N64410;Ambès-D;La Bernardine;0;0;0;1;Flottante;Amphibiens, Reptiles
+50;E4140N64285;Bruges;Jalle de Bruges;0;0;0;1;Flottante;Amphibiens, Odonates
+51;E3990N64305;Saint-Médard-E;Le Lignan;0;0;0;1;Flottante;Amphibiens, Reptiles
+52;E3985N64300;Saint-Médard-F;Le Bibey;0;0;0;1;Flottante;Odonates
+53;E4230N64265;Lormont;Le Gua;0;0;0;1;Flottante;Odonates

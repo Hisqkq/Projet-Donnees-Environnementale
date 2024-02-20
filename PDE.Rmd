@@ -1,11 +1,20 @@
 ---
 title: "PD"
-author: "Hamad Tria"
+author: "Hamad Tria, Baptiste Gerbouin, Alexandre Leys, Louis Delignac, Théo Lavandier"
 output: html_document
 ---
 
 ```{r}
-oiseaux <- read.csv("Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
-unique(oiseaux[,"Nom_PE"])
+oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
+head(oiseaux)
 ```
 
+```{r}
+sites <- read.csv("data/BiodiverCite_sites.csv", header = TRUE, sep = "\t")
+head(sites)
+```
+
+```{r}
+land <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE, sep = "\t")
+head(land)
+```

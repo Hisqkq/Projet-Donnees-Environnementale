@@ -6,17 +6,36 @@ output: html_document
 
 ```{r}
 oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
-head(oiseaux)
+LUP <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
 ```
 
-```{r}
-sites <- read.csv("data/BiodiverCite_sites.csv", header = TRUE, sep = "\t")
-head(sites)
-```
 
 ```{r}
-land <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE, sep = "\t")
-head(land)
+# CREATE A NEW COLUMN IN THE OISEAUX DATAFRAME THAT CONTAINS THE LATIN NAME OF THE BIRD
+# THE LATIN NAME IS THE FIRST NAME IN THE "Nom_Taxon_Cite" COLUMN
+# IF THE NAME CONTAINS A "|", THE LATIN NAME IS THE FIRST NAME BEFORE THE "|"
+
+# Split the names
+split_latin <- function(name) {
+  latin <- rep(NA, length(name))
+  for (i in 1:length(name)) {
+    if ("|" %in% unlist(strsplit(name[i], " | "))) {
+      latin[i] <- unlist(strsplit(name[i], " \\| "))[1]
+    } else {
+      latin[i] <- name[i]
+    }
+  }
+  return (latin)
+}
+
+# Test the function
+full_names <- as.vector(oiseaux$Nom_Taxon_Cite)
+only_latin <- split_latin(full_names)
+length(unique(only_latin)) == length(unique(oiseaux$Code_Ref))
+
+# Add the new column to the dataframe
+oiseaux$latin <- only_latin
 ```
+
 
 

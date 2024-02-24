@@ -1,14 +1,19 @@
 ---
-title: "PD"
+title: "PDE"
 author: "Hamad Tria, Baptiste Gerbouin, Alexandre Leys, Louis Delignac, Théo Lavandier"
 output: html_document
 ---
 
 ```{r}
+# install.packages("tidyverse")
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r}
 oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
 LUP <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
 ```
-
 
 ```{r}
 # CREATE A NEW COLUMN IN THE OISEAUX DATAFRAME THAT CONTAINS THE LATIN NAME OF THE BIRD
@@ -16,26 +21,65 @@ LUP <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
 # IF THE NAME CONTAINS A "|", THE LATIN NAME IS THE FIRST NAME BEFORE THE "|"
 
 # Split the names
-split_latin <- function(name) {
-  latin <- rep(NA, length(name))
-  for (i in 1:length(name)) {
-    if ("|" %in% unlist(strsplit(name[i], " | "))) {
-      latin[i] <- unlist(strsplit(name[i], " \\| "))[1]
-    } else {
-      latin[i] <- name[i]
-    }
+my_split <- function(array, str = " \\| ") {
+  out <- rep(NA, length(array))
+  for (i in 1:length(array)) {
+    out[i] <- unlist(strsplit(array[i], str))[1]
   }
-  return (latin)
+  return (out)
 }
 
 # Test the function
-full_names <- as.vector(oiseaux$Nom_Taxon_Cite)
-only_latin <- split_latin(full_names)
+only_latin <- my_split(as.vector(oiseaux$Nom_Taxon_Cite))
 length(unique(only_latin)) == length(unique(oiseaux$Code_Ref))
 
 # Add the new column to the dataframe
 oiseaux$latin <- only_latin
 ```
+
+```{r}
+# THE MOST FREQUENT BIRD SPECIES OBSERVED IN THE DATASET
+sort(table(oiseaux$latin), decreasing = TRUE)[1:10]
+```
+
+```{r}
+# FREQUENCY OF BIRD SPECIES OBSERVED IN THE DATASET BY YEAR
+Annee <- my_split(as.vector(oiseaux$Date), str = "-")
+oiseaux$Annee <- as.factor(Annee)
+table(oiseaux$latin, oiseaux$Annee)
+```
+
+```{r}
+# CREATE A NEW COLUMN IN THE OISEAUX DATAFRAME THAT CONTAINS THE MOS11 VALUE OF THE POINT
+filter <- LUP$BufferSize == 500
+LUP_500_MOS11 <- LUP[filter,c("Geometry", "ID", "X", "Y", "BufferSize", "MOS11")]
+rownames(LUP_500_MOS11) <- 1:nrow(LUP_500_MOS11)
+LUP_500_MOS11[, c("ID","MOS11")]
+
+MOS11 <- rep(NA, nrow(oiseaux))
+for (i in 1:nrow(oiseaux)) {
+  MOS11[i] <- which(oiseaux$Code_Maille[i] == LUP_500_MOS11$ID)
+}
+
+# Add the new column to the dataframe
+oiseaux$MOS11 <- LUP_500_MOS11$MOS11[MOS11]
+```
+
+```{r}
+# THE NUMBER OF BIRDS OBSERVED IN EACH MOS11 AREA BY YEAR
+data <- oiseaux %>%
+  group_by(Code_Maille, Annee, MOS11) %>%
+  select(Denombrement_min) %>% 
+  summarise(sum = sum(Denombrement_min, na.rm = TRUE))
+
+ggplot(data, aes(x=MOS11, y=sum, color=Annee)) +
+      geom_point(size=2) 
+```
+
+
+
+
+
 
 
 

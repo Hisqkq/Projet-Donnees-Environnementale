@@ -1,36 +1,33 @@
 ```{R}
-land <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE, sep = "\t")
+land <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE, sep = ",")
 head(land)
 ```
 
-```{R}
-# Create a static map of the land use data using the following columns from the data frame:
-#"X", "Y", "BufferSize", with coordinate in lambert 2 étendu format (do the conversion to lat/long)
+```{r}
+install.packages("ggspatial")
+install.packages("prettymapr")
+library(ggspatial)
+```
 
+
+```{R}
+library(sf)
 library(ggplot2)
+library(ggspatial)
 
-# Convert the coordinates (X AND Y) from lambert 93 to lat/long 
-land$lon <- (land$X - 700000) / 10000
-land$lat <- (land$Y - 6600000) / 10000
+land_sf <- st_as_sf(land, coords = c("X", "Y"), crs = 2154)
+land_sf_transformed <- st_transform(land_sf, crs = 4326)
 
-# Create a static map of the land use data using the following columns from the data frame:
-#"X", "Y", "BufferSize", with coordinate in lambert 2 étendu format (do the conversion to lat/long)
-
-ggplot(land, aes(x = land$lon, y = land$lat)) +
-  geom_point(aes(size = land$BufferSize), alpha = 0.5) +
-  scale_size_continuous(range = c(1, 10)) +
-  labs(title = "Land use data", x = "Longitude", y = "Latitude")
+ggplot(data = land_sf_transformed) +
+  annotation_map_tile() +  
+  geom_sf(aes(color = MOS11)) +  
+  scale_color_gradient(low = "blue", high = "red") +  
+  theme_minimal()
 ```
 
 ```{R}
-
-head(land)
+oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
+head(oiseaux)
 ```
 
-```{R}
 
-
-```
-
-```{R}
-```

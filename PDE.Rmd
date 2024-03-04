@@ -85,7 +85,40 @@ ggplot(data, aes(x=MOS11, y=sum, color=Annee)) +
 ```
 
 
+```{r}
+### TOTAL NUMBER OF OBSERVATIONS BY ZONE
+library(tidyverse)
+library(sf)
+library(ggplot2)
+library(ggspatial)
 
+biodiver_sites <- read.csv("data/BiodiverCite_sites.csv", header = TRUE, sep = ';')
+LUP <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
+oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
+
+merged_data <- merge(biodiver_sites, LUP, by.x = "code_site", by.y = "ID", all = TRUE)
+
+merged_data <- merge(merged_data, oiseaux, by.x = "code_site", by.y = "Code_Maille", all = TRUE)
+
+coordinates <- st_as_sf(merged_data, coords = c("X.y", "Y"), crs = 2154)
+coordinates <- st_transform(coordinates, crs = 4326)
+
+total_observations <- coordinates %>%
+  group_by(code_site) %>%
+  summarise(n = n())
+
+ggplot(data = total_observations) +
+  annotation_map_tile() +  
+  geom_sf(aes(size = n), color = 'blue', alpha = 0.5) +
+  scale_size_continuous(range = c(2, 12), 
+                        breaks = c(1, 100, 200, 500, 1000), 
+                        labels = c("1", "100", "200", "500", "1000")) +
+  labs(title = 'Nombre total d\'observations par zone d\'observation',
+       size = 'Nombre d\'observations') +
+  theme_minimal() +
+  guides(size = guide_legend(override.aes = list(alpha = 0.5)))
+
+```
 
 
 

@@ -16,6 +16,8 @@ output:
 library(tidyverse)
 library(ggplot2)
 library(kableExtra)
+library(sf)
+library(ggspatial)
 ```
 
 ```{r}
@@ -87,10 +89,6 @@ ggplot(data, aes(x=MOS11, y=sum, color=Annee)) +
 
 ```{r}
 ### TOTAL NUMBER OF OBSERVATIONS BY ZONE
-library(tidyverse)
-library(sf)
-library(ggplot2)
-library(ggspatial)
 
 biodiver_sites <- read.csv("data/BiodiverCite_sites.csv", header = TRUE, sep = ';')
 LUP <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
@@ -117,6 +115,24 @@ ggplot(data = total_observations) +
        size = 'Nombre d\'observations') +
   theme_minimal() +
   guides(size = guide_legend(override.aes = list(alpha = 0.5)))
+
+```
+
+```{r}
+# Noms des espèces les plus observes  par catégorie de vent
+merged_data$Nom_Latin <- sapply(strsplit(merged_data$Nom_Taxon_Cite, " \\| "), `[`, 1)
+
+species_by_wind <- merged_data %>%
+  group_by(Vent, Nom_Latin) %>%
+  summarise(count = n()) %>%
+  arrange(Vent, desc(count))
+
+top_species_by_wind <- species_by_wind %>%
+  group_by(Vent) %>%
+  slice_max(order_by = count, n = 1) %>%
+  ungroup()
+
+top_species_by_wind
 
 ```
 

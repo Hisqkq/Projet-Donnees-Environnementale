@@ -176,26 +176,93 @@ top_species_by_temperature
 ## On doit analyser les pics de diversité par zone MOS
 
 ```{r}
-# On compte le nombre d'espece differentes (espece uniques), à chaque valeur differente de la colonne MOS 11 
+# On compte le nombre d'espece differentes (espece uniques), à chaque valeur differente de la colonne MOS 11
 
-unique_species_by_MOS11 <- merged_data %>%
-  group_by(MOS11) %>%
-  summarise(n = n_distinct(Nom_Latin))
+# On regroupe les valeurs de la colonne MOS11 dans des intervalles tous les 0.1 pour faciliter le groupement par la suite. On fait ça avec le dataframe merfe_data, sans modifier la valeur MOS11 de merged data
 
-# On regroupe les valeurs par traches de MOS11 tous les 0.1, et on fait la sum pour avoir un point par tranche
+# On crée une nouvelle colonne MOS11_interval dans le dataframe merged_data
 
-unique_species_by_MOS11$MOS11 <- cut(unique_species_by_MOS11$MOS11, breaks = seq(0, 1, by = 0.1))
+merged_data$MOS11_interval <- cut(merged_data$MOS11, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE)
 
-# On affiche le resultat avec un scatter plot
+# On compte le nombre d'espece unique par intervalle de MOS11
 
-ggplot(data = unique_species_by_MOS11) +
-  geom_point(aes(x = MOS11, y = n), color = 'blue') +
-  labs(title = 'Nombre d\'espèces uniques par zone MOS11',
+species_by_MOS11 <- merged_data %>%
+  group_by(MOS11_interval) %>%
+  summarise(n_species = n_distinct(Nom_Latin))
+
+# On affiche le nombre d'espece unique par intervalle de MOS11
+
+ggplot(data = species_by_MOS11) +
+  geom_bar(aes(x = MOS11_interval, y = n_species), stat = "identity") +
+  labs(title = 'Nombre d\'espèces uniques par intervalle de MOS11',
        x = 'MOS11',
        y = 'Nombre d\'espèces uniques') +
   theme_minimal()
 
+```
 
+```{r}
+# On créer une fonction qui calcule l'indice de Shannon 
+
+shannon_index <- function(x) {
+  p <- x / sum(x)
+  exp(-sum(p * log(p)))
+}
+
+# sachant qu'on le nombre d'observation dans la colonne denombrement_min, calculons l'indice de Shannon pour chaque zonne Nom_lieu
+
+shannon_by_site <- merged_data %>%
+  group_by(name_site) %>%
+  summarise(shannon = shannon_index(Denombrement_min))
+
+# Chaque lieu correspond à une valeur de MOS11, on peut donc afficher l'indice de Shannon en fonction de MOS11. On reprend donc les valeurs qu'on a calculer pour chaque lieu et on les fait correspondre à la valeur de MOS11
+
+shannon_by_MOS11 <- merged_data %>%
+  group_by(MOS11) %>%
+  summarise(shannon = shannon_index(Denombrement_min))
+
+# On drop les NA
+
+shannon_by_MOS11 <- shannon_by_MOS11[!is.na(shannon_by_MOS11$shannon), ]
+
+# On fait la moeyyenne des indices sur des intervalles de MOS11 tous les 0.1
+
+shannon_by_MOS11$MOS11_interval <- cut(shannon_by_MOS11$MOS11, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE)
+
+shannon_by_MOS11 <- shannon_by_MOS11 %>%
+  group_by(MOS11_interval) %>%
+  summarise(shannon = mean(shannon))
+
+# On affiche l'indice de Shannon en fonction de MOS11 avec un barchart
+
+ggplot(data = shannon_by_MOS11) +
+  geom_bar(aes(x = MOS11_interval, y = shannon), stat = "identity") +
+  labs(title = 'Indice de Shannon par intervalle de MOS11',
+       x = 'MOS11',
+       y = 'Indice de Shannon') +
+  theme_minimal()
+
+```
+
+```{r}
+
+# On fait la meme chose par année (on a un colonne date, on peut donc extraire l'année)
+
+merged_data$year <- year(merged_data$date)
+
+
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
 
 ```
 

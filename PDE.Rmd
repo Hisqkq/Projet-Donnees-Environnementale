@@ -176,12 +176,29 @@ top_species_by_temperature
 ## On doit analyser les pics de diversité par zone MOS
 
 ```{r}
-# On compte le nombre d'espece differentes par type de MOS
+# On compte le nombre d'espece differentes (espece uniques), à chaque valeur differente de la colonne MOS 11 
 
+unique_species_by_MOS11 <- merged_data %>%
+  group_by(MOS11) %>%
+  summarise(n = n_distinct(Nom_Latin))
+
+# On regroupe les valeurs par traches de MOS11 tous les 0.1, et on fait la sum pour avoir un point par tranche
+
+unique_species_by_MOS11$MOS11 <- cut(unique_species_by_MOS11$MOS11, breaks = seq(0, 1, by = 0.1))
+
+# On affiche le resultat avec un scatter plot
+
+ggplot(data = unique_species_by_MOS11) +
+  geom_point(aes(x = MOS11, y = n), color = 'blue') +
+  labs(title = 'Nombre d\'espèces uniques par zone MOS11',
+       x = 'MOS11',
+       y = 'Nombre d\'espèces uniques') +
+  theme_minimal()
 
 
 
 ```
+
 
 
 

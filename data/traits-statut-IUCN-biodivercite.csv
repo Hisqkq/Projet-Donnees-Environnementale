@@ -1,0 +1,88 @@
+Nom latin,Code,Nom vernaculaire,Niveau de spécialisation,Régime alimentaire,Technique d'alimentation,Nidification,Période de migration,Statut IUCN (France/monde),Statut de protection
+Acrocephalus schoenobaenus,ACRSCH,Phragmite des joncs,Agricole,Carnivore,Glanage sous-bois,Buisson,Migrateur précoce,LC/LC,Oui
+Acrocephalus scirpaceus,ACRSCI,Rousserolle effarvatte,Zone humide,Carnivore,Glanage sous-bois,Buisson,Migrateur précoce,LC/LC,Oui
+Actitis hypoleucos,ACTHYP,Chevalier guignette,Zone humide,Carnivore,Sondage sol,Au sol,Sédentaire,NT/LC,Oui
+Aegithalos caudatus,AEGCAU,Mésange à longue queue,Forêt,Mixte,Glanage sous-bois,Buisson,Sédentaire,LC/LC,Oui
+Alcedo atthis,ALCATT,Martin-pêcheur d'Europe,Zone humide,Carnivore,Pêche,Cavité,Sédentaire,VU/LC,Oui
+Anas platyrhynchos,ANAPLA,Canard colvert,Zone humide,Mixte,Pêche,Au sol,Sédentaire,LC/LC,Non
+Anthus trivialis,ANTTRI,Pipit des arbres,Forêt,Carnivore,Glanage sol,Au sol,Migrateur précoce,LC/LC,Oui
+Ardea alba,ARDALB,Grande Aigrette,Zone humide,Carnivore,Pêche,Buisson,Sédentaire,NT/LC,Oui
+Ardea cinerea,ARDCIN,Héron cendré,Zone humide,Carnivore,Pêche,Arbre,Sédentaire,LC/LC,Oui
+Bubulcus ibis,BUBIBI,Héron garde-boeufs,Zone humide,Carnivore,Glanage sol,Buisson,Sédentaire,LC/LC,Oui
+Buteo buteo,BUTBUT,Buse variable,Agricole,Carnivore,Capture au sol,Arbre,Sédentaire,LC/LC,Oui
+Carduelis carduelis,CARCAR,Chardonneret élégant,Bâti,Végétarien,Glanage sous-bois,Arbre,Sédentaire,VU/LC,Oui
+Certhia brachydactyla,CERBRA,Grimpereau des jardins,Forêt,Carnivore,Ecorce,Cavité,Sédentaire,LC/LC,Oui
+Cettia cetti,CETCET,Bouscarle de Cetti,Zone humide,Carnivore,Glanage sous-bois,Buisson,Sédentaire,NT/LC,Oui
+Chloris chloris,CHLCHL,Verdier d'Europe,Bâti,Végétarien,Glanage sous-bois,Buisson,Sédentaire,VU/LC,Oui
+Ciconia ciconia,CICCIC,Cigogne blanche,Zone humide,Carnivore,Glanage sol,Arbre,Migrateur précoce,LC/LC,Oui
+Circus pygargus,CIRPYG,Busard cendré,Agricole,Carnivore,Capture au sol,Au sol,Migrateur précoce,NT/LC,Oui
+Cisticola juncidis,CISJUN,Cisticole des joncs,Agricole,Mixte,Glanage sol,Au sol,Sédentaire,VU/LC,Oui
+Columba livia f. domestica,COLLIV,Pigeon biset domestique,Bâti,Végétarien,Glanage sol,Cavité,Sédentaire,LC/LC,Non
+Columba palumbus,COLPAL,Pigeon ramier,Généraliste,Végétarien,Glanage sol,Arbre,Sédentaire,LC/LC,Non
+Corvus corone,CORCOR,Corneille noire,Généraliste,Mixte,Sondage sol,Arbre,Sédentaire,LC/LC,Non
+Cuculus canorus,CUCCAN,Coucou gris,Généraliste,Carnivore,Glanage canopée,Arbre,Migrateur précoce,LC/LC,Oui
+Cyanistes caeruleus,CYACAE,Mésange bleue,Généraliste,Mixte,Glanage canopée,Cavité,Sédentaire,LC/LC,Oui
+Cygnus olor,CYGOLO,Cygne tuberculé,Zone humide,Mixte,Pêche,Au sol,Sédentaire,LC/LC,Oui
+Dendrocopos major,DENMAJ,Pic épeiche,Forêt,Mixte,Ecorce,Cavité,Sédentaire,LC/LC,Oui
+Dendrocopos minor,DENMIN,Pic épeichette,Forêt,Carnivore,Ecorce,Cavité,Sédentaire,VU/LC,Oui
+Egretta garzetta,EGRGAR,Aigrette garzette,Zone humide,Carnivore,Pêche,Arbre,Sédentaire,LC/LC,Oui
+Emberiza cirlus,EMBCIR,Bruant zizi,Agricole,Mixte,Glanage sol,Au sol,Sédentaire,LC/LC,Oui
+Emberiza schoeniclus,EMBSCH,Bruant des roseaux,Zone humide,Mixte,Glanage sous-bois,Au sol,Sédentaire,EN/LC,Oui
+Erithacus rubecula,ERIRUB,Rougegorge familier,Forêt,Carnivore,Glanage sous-bois,Cavité,Sédentaire,LC/LC,Oui
+Falco tinnunculus,FALTIN,Faucon crécerelle,Agricole,Carnivore,Capture au sol,Cavité,Sédentaire,LC/LC,Oui
+Ficedula hypoleuca,FICHYP,Gobemouche noir,Forêt,Mixte,En vol,Cavité,Migrateur tardif,VU/LC,Oui
+Fulica atra,FULATR,Foulque macroule,Zone humide,Mixte,Glanage sol,Sol,Sédentaire,LC/LC,Non
+Fringilla coelebs,FRICOE,Pinson des arbres,Généraliste,Végétarien,Glanage canopée,Arbre,Sédentaire,LC/LC,Oui
+Gallinula chloropus,GALCHL,Gallinule poule-d'eau,Zone humide,Mixte,Pêche,Au sol,Sédentaire,LC/LC,Non
+Garrulus glandarius,GARGLA,Geai des chênes,Généraliste,Mixte,Glanage sous-bois,Buisson,Sédentaire,LC/LC,Non
+Hippolais polyglotta,HIPPOL,Hypolaïs polyglotte,Généraliste,Mixte,Glanage sous-bois,Buisson,Migrateur précoce,LC/LC,Non
+Hirundo rustica,HIRRUS,Hirondelle rustique,Bâti,Carnivore,En vol,Bâtiment,Migrateur précoce,NT/LC,Oui
+Jynx torquilla,JYNTOR,Torcol fourmilier,Agricole,Mixte,Sondage sol,Cavité,Migrateur précoce,LC/LC,Oui
+Lanius collurio,LANCOL,Pie-grièche écorcheur,Agricole,Carnivore,En vol,Buisson,Migrateur tardif,NT/LC,Oui
+Linaria cannabina,LINCAN,Linotte mélodieuse,Agricole,Végétarien,Glanage sol,Buisson,Sédentaire,VU/LC,Oui
+Locustella luscinioides,LOCLUS,Locustelle luscinioïde,Zone humide,Carnivore,Glanage sous-bois,Buisson,Migrateur précoce,EN/LC,Oui
+Locustella naevia,LOCNAE,Locustelle tachetée,Agricole,Carnivore,Glanage sous-bois,Buisson,Migrateur précoce,NT/LC,Oui
+Lophophanes cristatus,LOPCRI,Mésange huppée,Forêt,Carnivore,Glanage canopée,Cavité,Sédentaire,LC/LC,Oui
+Luscinia megarhynchos,LUSMEG,Rossignol philomèle,Généraliste,Mixte,Glanage sous-bois,Buisson,Migrateur précoce,LC/LC,Oui
+Luscinia svecica,LUSSVE,Gorgebleue à miroir,Zone humide,Mixte,Glanage sous-bois,Au sol,Migrateur précoce,LC/LC,Oui
+Milvus migrans,MILMIG,Milan noir,Généraliste,Carnivore,Capture au sol,Arbre,Migrateur précoce,LC/LC,Oui
+Motacilla alba,MOTALB,Bergeronnette grise,Agricole,Carnivore,Glanage sol,Cavité,Sédentaire,LC/LC,Oui
+Motacilla cinerea,MOTCIN,Bergeronnette des ruisseaux,Zone humide,Carnivore,Glanage sol,Cavité,Sédentaire,LC/LC,Oui
+Motacilla flava,MOTFLA,Bergeronnette printanière,Agricole,Carnivore,Glanage sol,Au sol,Migrateur précoce,LC/LC,Oui
+Muscicapa striata,MUSSTR,Gobemouche gris,Forêt,Mixte,En vol,Cavité,Migrateur tardif,NT/LC,Oui
+Oriolus oriolus,ORIORI,Loriot d'Europe,Généraliste,Mixte,Glanage canopée,Arbre,Migrateur précoce,LC/LC,Oui
+Pandion haliaetus,PANHAL,Balbuzard pêcheur,Zone humide,Carnivore,Pêche,Arbre,Passage,VU/LC,Oui
+Parus major,PARMAJ,Mésange charbonnière,Généraliste,Carnivore,Glanage canopée,Cavité,Sédentaire,LC/LC,Oui
+Passer domesticus,PASDOM,Moineau domestique,Bâti,Végétarien,Glanage sol,Cavité,Sédentaire,LC/NE,Oui
+Pernis apivorus,PERAPI,Bondrée apivore,Agricole,Mixte,Localisation de la ruche,Arbre,Migrateur tardif,LC/LC,Oui
+Phalacrocorax carbo,PHACAR,Grand Cormoran,Zone humide,Carnivore,Pêche,Arbre,Sédentaire,LC/LC,Oui
+Phasianus colchicus,PHACOL,Faisan de Colchide,Agricole,Mixte,Sondage sol,Au sol,Sédentaire,LC/LC,Non
+Phoenicurus ochruros,PHOOCH,Rougequeue noir,Bâti,Mixte,En vol,Cavité,Sédentaire,LC/LC,Oui
+Phoenicurus phoenicurus,PHOPHO,Rougequeue à front blanc,Bâti,Carnivore,En vol,Cavité,Migrateur précoce,LC/LC,Oui
+Phylloscopus bonelli,PHYBON,Pouillot de Bonelli,Forêt,Mixte,Glanage canopée,Au sol,Migrateur précoce,LC/NE,Oui
+Phylloscopus collybita,PHYCOL,Pouillot véloce,Forêt,Mixte,Glanage canopée,Au sol,Sédentaire,LC/LC,Oui
+Phylloscopus trochilus,PHYTRO,Pouillot fitis,Forêt,Carnivore,Glanage canopée,Au sol,Migrateur précoce,NT/LC,Oui
+Pica pica,PICPIC,Pie bavarde,Bâti,Mixte,Glanage sol,Arbre,Sédentaire,LC/LC,Non
+Picus viridis,PICVIR,Pic vert,Généraliste,Mixte,Sondage sol,Cavité,Sédentaire,LC/LC,Oui
+Anthus pratensis,ANTPRA,Pipit farlouse,Agricole,Mixte,Glanage sol,Au sol,Migrateur précoce,VU/LC,Oui
+Podiceps cristatus,PODCRI,Grèbe huppé,Zone humide,Carnivore,Pêche,Au sol,Sédentaire,LC/LC,Oui
+Poecile palustris,POEPAL,Mésange nonnette,Forêt,Carnivore,Glanage canopée,Cavité,Sédentaire,LC/LC,Oui
+Prunella modularis,PRUMOD,Accenteur mouchet,Généraliste,Mixte,Glanage sol,Buisson,Sédentaire,LC/LC,Oui
+Pyrrhula pyrrhula,PYRPYR,Bouvreuil pivoine,Forêt,Mixte,Glanage sous-bois,Arbre,Sédentaire,VU/LC,Oui
+Regulus ignicapilla,REGIGN,Roitelet à triple bandeau,Forêt,Carnivore,Glanage canopée,Arbre,Sédentaire,LC/LC,Oui
+Saxicola rubicola,SAXRUB,Tarier pâtre,Agricole,Mixte,En vol,Au sol,Sédentaire,NT/LC,Oui
+Serinus serinus,SERSER,Serin cini,Bâti,Mixte,Glanage sol,Buisson,Sédentaire,VU/LC,Oui
+Sitta europaea,SITEUR,Sittelle torchepot,Forêt,Carnivore,Ecorce,Cavité,Sédentaire,LC/LC,Oui
+Spinus spinus,SPISPI,Tarin des aulnes,Forêt,Végétarien,Glanage canopée,Arbre,Migrateur précoce,LC/LC,Oui
+Streptopelia decaocto,STRDEC,Tourterelle turque,Bâti,Végétarien,Glanage sol,Arbre,Sédentaire,LC/LC,Non
+Streptopelia turtur,STRTUR,Tourterelle des bois,Forêt,Végétarien,Glanage sol,Buisson,Migrateur précoce,VU/LC,Non
+Sturnus vulgaris,STUVUL,Étourneau sansonnet,Généraliste,Mixte,Sondage sol,Cavité,Sédentaire,LC/LC,Non
+Sylvia atricapilla,SYLATR,Fauvette à tête noire,Généraliste,Mixte,Glanage sous-bois,Buisson,Sédentaire,LC/LC,Oui
+Sylvia communis,SYLCOM,Fauvette grisette,Agricole,Mixte,Glanage sous-bois,Buisson,Migrateur précoce,LC/LC,Oui
+Sylvia undata,SYLUND,Fauvette pitchou,Forêt,Mixte,Glanage sous-bois,Buisson,Sédentaire,EN/LC,Oui
+Oenanthe oenanthe,OENOEN,Traquet motteux,Agricole,Carnivore,Glanage sol,Cavité,Migrateur précoce,NT/LC,Oui
+Troglodytes troglodytes,TROTRO,Troglodyte mignon,Forêt,Carnivore,Glanage sol,Buisson,Sédentaire,LC/LC,Oui
+Turdus merula,TURMER,Merle noir,Généraliste,Mixte,Sondage sol,Buisson,Sédentaire,LC/LC,Non
+Turdus philomelos,TURPHI,Grive musicienne,Forêt,Mixte,Sondage sol,Buisson,Sédentaire,LC/LC,Non
+Turdus viscivorus,TURVIS,Grive draine,Forêt,Mixte,Sondage sol,Arbre,Sédentaire,LC/LC,Non
+Upupa epops,UPUEPO,Huppe fasciée,Agricole,Carnivore,Sondage sol,Cavité,Migrateur précoce,LC/LC,Oui

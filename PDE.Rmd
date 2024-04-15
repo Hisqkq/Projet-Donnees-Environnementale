@@ -136,7 +136,52 @@ top_species_by_wind
 
 ```
 
+```{r}
+# Noms des espèces les plus observes  par nom de site
 
+species_by_site <- merged_data %>%
+  group_by(name_site, Nom_Latin) %>%
+  summarise(count = n()) %>%
+  arrange(name_site, desc(count))
+
+top_species_by_site <- species_by_site %>%
+  group_by(name_site) %>%
+  slice_max(order_by = count, n = 1) %>%
+  ungroup()
+
+top_species_by_site
+
+```
+
+
+
+
+```{r}
+# Noms des espèces les plus observes  par temperature
+
+species_by_temperature <- merged_data %>%
+  group_by(Temperature, Nom_Latin) %>%
+  summarise(count = n()) %>%
+  arrange(Temperature, desc(count))
+
+top_species_by_temperature <- species_by_temperature %>%
+  group_by(Temperature) %>%
+  slice_max(order_by = count, n = 1) %>%
+  ungroup()
+
+top_species_by_temperature
+```
+
+
+## On doit analyser les pics de diversité par zone MOS
+
+```{r}
+# On compte le nombre d'espece differentes par type de MOS
+
+
+
+
+```
 
 
 

@@ -246,26 +246,194 @@ ggplot(data = shannon_by_MOS11) +
 
 ```{r}
 
-# On fait la meme chose par année (on a un colonne date, on peut donc extraire l'année)
+# On prend les 4 premiers charactères de la colonne date pour extraire l'année
 
-merged_data$year <- year(merged_data$date)
+merged_data$year <- as.numeric(substr(merged_data$date, 1, 4))
 
+
+shannon_by_site2018 <- merged_data %>%
+  filter(year == 2018) %>%
+  group_by(name_site) %>%
+  summarise(shannon = shannon_index(Denombrement_min))
+
+shannon_by_MOS11_2018 <- merged_data %>%
+  filter(year == 2018) %>%
+  group_by(MOS11) %>%
+  summarise(shannon = shannon_index(Denombrement_min))
+
+shannon_by_MOS11_2018 <- shannon_by_MOS11_2018[!is.na(shannon_by_MOS11_2018$shannon), ]
+
+shannon_by_MOS11_2018$MOS11_interval <- cut(shannon_by_MOS11_2018$MOS11, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE)
+
+shannon_by_MOS11_2018 <- shannon_by_MOS11_2018 %>%
+  group_by(MOS11_interval) %>%
+  summarise(shannon = mean(shannon))
+
+
+ggplot(data = shannon_by_MOS11_2018) +
+  geom_bar(aes(x = MOS11_interval, y = shannon), stat = "identity") +
+  labs(title = 'Indice de Shannon par intervalle de MOS11 en 2018',
+       x = 'MOS11',
+       y = 'Indice de Shannon') +
+  theme_minimal()
+
+```
+
+```{r}
+# On a observé que le pic de diversité se situe entre 0.2 et 0.4 MOS11, on va donc s'intéresser à cette zone
+
+# On commence par load les données de caractistiques des espèces d'oiseaux
+
+bird_data <- read_csv('data/traits-statut-IUCN-biodivercite.csv')
+
+# On merge les données de traits avec les données de dénombrement (la colonne nom s'appelle Nom latin pour bird data)
+
+merged_data <- left_join(merged_data, bird_data, by = c('Nom_Latin' = 'Nom latin'))
+
+
+
+
+
+```
+```{r}
+merged_data <- merged_data %>%
+  rename(Niveau_de_specialisation = `Niveau de spécialisation`)
+```
+
+
+
+```{r}
+
+# On normalise les données des observations par site afin que chaque site soit comparable. Pour ce faire on va tout convertir en pourcentage de l'observation par site. 
+
+merged_data <- merged_data %>%
+  group_by(name_site) %>%
+  mutate(Denombrement_min_norm = Denombrement_min / sum(Denombrement_min))
+
+## On supprime les NA de la colonne Denombrement_min_norm
+
+merged_data <- merged_data[!is.na(merged_data$Denombrement_min_norm), ]
+
+## On supprime les NA de la colonne Niveau_de_specialisation
+
+merged_data <- merged_data[!is.na(merged_data$Niveau_de_specialisation), ]
+
+# On plot les valeurs normalisées en fonction de MOS11
+
+ggplot(data = merged_data) +
+  geom_point(aes(x = MOS11, y = Denombrement_min_norm, color = Niveau_de_specialisation)) +
+  labs(title = 'Dénombrement normalisé en fonction de MOS11',
+       x = 'MOS11',
+       y = 'Dénombrement normalisé') +
+  theme_minimal()
+
+```
+
+```{r}
+
+# Maintenant qu'on a la colonne denombrement_min_norm on peut faire la densité des oiseaux en fonction de MOS11 par rapport à cette variable
+
+ggplot(data = merged_data) +
+  geom_density(aes(x = MOS11, color = Niveau_de_specialisation), fill = 'blue', alpha = 0.5) +
+  labs(title = 'Densité des oiseaux en fonction de MOS11',
+       x = 'MOS11',
+       y = 'Densité') +
+  theme_minimal()
+
+```
+
+```{r}
+
+
+# On refait la densité en rajoutant en poid aux observations avec la colonne denombrement_min_norm qui correspond au nombre d'observation normalisé par site
+
+ggplot(data = merged_data) +
+  geom_density(aes(x = MOS11, color = Niveau_de_specialisation, weight = Denombrement_min_norm), fill = 'blue', alpha = 0.5) +
+  labs(title = 'Densité des oiseaux en fonction de MOS11',
+       x = 'MOS11',
+       y = 'Densité') +
+  theme_minimal()
+
+```
+
+
+
+
+
+```{r}
+
+merged_data$MOS11 <- as.numeric(merged_data$MOS11)
+
+ggplot(data = merged_data, aes(x = MOS11, y = Denombrement_min_norm, color = Niveau_de_specialisation)) +
+  geom_density_2d(alpha = 0.5) +
+  labs(title = 'Évolution de la spécialisation en fonction de MOS11',
+       x = 'MOS11',
+       y = 'Pourcentage d\'observations',
+       color = 'Niveau de spécialisation') +
+  theme_minimal()
+
+
+```
+
+
+```{r}
+ggplot(data = merged_data, aes(x = MOS11, y = Denombrement_min_norm, fill = Niveau_de_specialisation)) +
+  geom_violin() +
+  labs(title = 'Évolution de la spécialisation en fonction de MOS11',
+       x = 'MOS11',
+       y = 'Pourcentage d\'observations',
+       fill = 'Niveau de spécialisation') +
+  theme_minimal()
+
+
+
+```
+
+
+
+
+```{r}
+
+# On fait la courbe de densité des oiseaux en fonction de MOS11, avec les oiseaux de Niveau de spécialisation qui vaut Generaliste
+
+# On renome Niveau de spécialisation en Niveau_de_specialisation
+
+
+ggplot(data = merged_data %>% filter(Niveau_de_specialisation == 'Généraliste')) +
+  geom_density(aes(x = MOS11), fill = 'blue', alpha = 0.5) +
+  labs(title = 'Densité des oiseaux Généralistes en fonction de MOS11',
+       x = 'MOS11',
+       y = 'Densité') +
+  theme_minimal()
+
+```
+
+```{r}
+
+ggplot(data = merged_data %>% filter(Niveau_de_specialisation == 'Bâti')) +
+  geom_density(aes(x = MOS11), fill = 'blue', alpha = 0.5) +
+  labs(title = 'Densité des oiseaux de type Bâti en fonction de MOS11',
+       x = 'MOS11',
+       y = 'Densité') +
+  theme_minimal()
 
 
 ```
 
 ```{r}
 
+ggplot(data = merged_data %>% filter(Niveau_de_specialisation == 'Forêt')) +
+  geom_density(aes(x = MOS11), fill = 'blue', alpha = 0.5) +
+  labs(title = 'Densité des oiseaux de type Forêt en fonction de MOS11',
+       x = 'MOS11',
+       y = 'Densité') +
+  theme_minimal()
+
 ```
+
 
 ```{r}
 
 ```
-
-```{r}
-
-```
-
-
 
 

@@ -89,18 +89,19 @@ ggplot(index, aes(x = MOS11, y = D3, color = annee)) +
   theme_minimal() +
   theme(legend.position = "bottom")
 ```
+
 ```{r}
 traits <- read.csv("data/traits-statut-IUCN-biodivercite.csv", header = TRUE)
-traits
 
 
 
-#on veut traiter la table dénombrement qu'on appelera denombrementCarte où il restera pour chaque maille et pour chaque année le top 3 des oiseaux les plus observés 
+#on veut traiter la table dénombrement qu'on appelera denombrementCarte où il restera pour chaque maille et pour chaque année le top 2 des oiseaux les plus observés. On veut garder structement 2 valeurs, meme si il ya une egalité. On en prend une des deux.
 
 denombrementCarte <- denombrement %>%
   group_by(Code_Maille, annee) %>%
-  top_n(3, sum) %>%
-  arrange(Code_Maille, annee)
+  top_n(2, sum) %>%
+  arrange(desc(Code_Maille), desc(sum)) %>%
+  ungroup()
 
 #maintenant dans denombrementCarte on veut ajouter les informations sur les traits des oiseaux, notamment la variable Niveau.de.spécialisation depuis traits
 
@@ -115,33 +116,70 @@ denombrementCarte <- denombrementCarte %>%
 #on veut rajouter les variables x et y de LUP dans denombrementCarte pour chaque maille
 
 denombrementCarte <- denombrementCarte %>%
-  left_join(LUP, by = c("Code_Maille" = "ID"))
+  left_join(LUP, by = c("Code_Maille" = "ID")) 
+
+# On garde que les lignes ou BufferSize == 500
+denombrementCarte <- denombrementCarte %>%
+  filter(BufferSize == 500)
+
 
 denombrementCarte <- denombrementCarte %>%
   select(Code_Maille, annee, latin, sum, Niveau.de.spécialisation, X, Y, MOS11)
 
-denombrementCarte
 
 denombrementCarte <- st_as_sf(denombrementCarte, coords = c("X", "Y"), crs = 2154)
 denombrementCarte <- st_transform(denombrementCarte, crs = 4326)
 
 #pour chaque maille, on veut qu'une ligne par maile et par année et pour le top trois, faire 3 colonnes nomlatin1, sum1, nomlatin2, sum2, nomlatin3, sum3
 
+denombrementCarte <- denombrementCarte %>%
+  group_by(Code_Maille, annee) %>%
+  mutate(rank = dense_rank(-sum)) %>%
+  filter(rank <= 2) %>%
+  pivot_wider(names_from = rank, values_from = c(latin, sum, Niveau.de.spécialisation), names_sep = "") %>%
+  select(Code_Maille, annee, latin1, sum1, Niveau.de.spécialisation1, latin2, sum2, Niveau.de.spécialisation2, MOS11, geometry) %>%
+  filter(!is.na(latin1) & !is.na(latin2))
+
+denombrementCarte$latin2 <- sapply(denombrementCarte$latin1, function(x) {
+  if (is.list(x) && length(x) > 1) {
+    return(x[[2]])
+  } 
+})
+
+denombrementCarte$sum2 <- sapply(denombrementCarte$sum1, function(x) {
+  if (is.list(x) && length(x) > 1) {
+    return(x[[2]])
+  } 
+})
+
+denombrementCarte$Niveau.de.spécialisation2 <- sapply(denombrementCarte$Niveau.de.spécialisation1, function(x) {
+  if (is.list(x) && length(x) > 1) {
+    return(x[[2]])
+  } 
+})
+
+denombrementCarte$latin1 <- sapply(denombrementCarte$latin1, function(x) ifelse(is.list(x), x[[1]], x))
+denombrementCarte$sum1 <- sapply(denombrementCarte$sum1, function(x) ifelse(is.list(x), x[[1]], x))
+denombrementCarte$Niveau.de.spécialisation1 <- sapply(denombrementCarte$Niveau.de.spécialisation1, function(x) ifelse(is.list(x), x[[1]], x))
+
+
+
+
+
+print(denombrementCarte)
+
 ```
 
+```{r}
 
 # Créer une chaîne de caractères pour les popups avec le top 3 des noms latins
 denombrementCarte$popup_text <- paste0("<strong>Maille:</strong> ", denombrementCarte$Code_Maille, "<br>",
-                                      "<strong>Top 3 des noms latins:</strong>", "<br>",
-                                      denombrementCarte$nomlatin1, " (", denombrementCarte$sum1, ")", "<br>",
-                                      denombrementCarte$nomlatin2, " (", denombrementCarte$sum2, ")", "<br>",
-                                      denombrementCarte$nomlatin3, " (", denombrementCarte$sum3, ")")
-
-
-
-
+                                      "<strong>Top 1 des noms latins:</strong>", "<br>",
+                                      denombrementCarte$latin1, " (", denombrementCarte$sum1, ") ", denombrementCarte$Niveau.de.spécialisation1 ,"<br>")
 
 ```
+
+
 
 
 ```{r}
@@ -149,16 +187,10 @@ library(leaflet)
 
 pal <- colorNumeric("viridis", domain = denombrementCarte$MOS11)
 
-leaflet(data = denombrementCarte) %>%
-  addProviderTiles("CartoDB.Positron") %>%
-  addCircles(radius = 300, color = ~pal(MOS11), fillOpacity = 0.2) %>%
-  addLegend("bottomright", pal = pal, values = ~MOS11, title = "MOS11", position = "bottomright") %>%
-  addScaleBar(position = "bottomleft")
-
 # Créer la carte avec leaflet
 leaflet(data = denombrementCarte) %>%
   addProviderTiles("CartoDB.Positron") %>%
-  addCircles(radius = 300, color = ~pal(MOS11), fillOpacity = 0.2, popup = ~popup_text) %>%  # Ajouter les popups
+  addCircles(radius = 300, color = ~pal(MOS11), fillOpacity = 0.2, popup = ~popup_text) %>%  
   addLegend("bottomright", pal = pal, values = ~MOS11, title = "MOS11", position = "bottomright") %>%
   addScaleBar(position = "bottomleft")
 

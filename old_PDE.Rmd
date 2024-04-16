@@ -117,6 +117,41 @@ ggplot(data = total_observations) +
   guides(size = guide_legend(override.aes = list(alpha = 0.5)))
 
 ```
+```{r}
+# On va faire une carte leaflet pour visualiser chaque zone en fonction de sa buffer size
+library(leaflet)
+
+LUP <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
+
+# LUP contient chaque zone d'observation. On a ses coordonnées, et sa buffersize.
+# Les coordonnées sont dans les colonnes X et Y, et la buffersize dans la colonne BufferSize. 
+# Il faut d'abord convertir les coordonnées en coordonnées géographiques (latitude et longitude)
+
+coordinates <- st_as_sf(LUP, coords = c("X", "Y"), crs = 2154)
+coordinates <- st_transform(coordinates, crs = 4326)
+
+#ON prend que les coordinates avec BufferSize = 500
+coordinates <- coordinates[coordinates$BufferSize == 500,]
+
+# On va maintenant créer une carte leaflet pour visualiser chaque zone d'observation
+pal <- colorNumeric("viridis", domain = coordinates$MOS11)
+
+leaflet(data = coordinates) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addCircles(radius = 300, color = ~pal(MOS11), fillOpacity = 0.5) %>%
+  addLegend("bottomright", pal = pal, values = coordinates$MOS11, title = "MOS11") %>%
+  addScaleBar(position = "bottomleft")
+```
+
+```{r}
+
+
+
+
+
+```
+
+
 
 ```{r}
 # Noms des espèces les plus observes  par catégorie de vent

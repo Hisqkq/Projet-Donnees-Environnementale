@@ -1,0 +1,172 @@
+---
+title: "Projet stat pour données environnementales"
+author: "Louis Delignac, Baptiste Gerbouin, Théo Lavandier, Alexandre Leys, Hamad Tria"
+date: "`r format(Sys.Date(), '%d %B, %Y')`"
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 2
+    number_sections: true
+    df_print: kable
+    highlight: tango
+---
+
+```{r setup, message=FALSE, echo=FALSE}
+# install.packages("tidyverse")
+library(tidyverse)
+library(ggplot2)
+library(kableExtra)
+library(sf)
+library(ggspatial)
+```
+
+```{r}
+oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
+# CREATE A NEW COLUMN IN THE OISEAUX DATAFRAME THAT CONTAINS THE LATIN NAME OF THE BIRD
+my_split <- function(array, str = " \\| ") {
+  out <- rep(NA, length(array))
+  for (i in 1:length(array)) {
+    out[i] <- unlist(strsplit(array[i], str))[1]
+  }
+  return (out)
+}
+
+only_latin <- my_split(as.vector(oiseaux$Nom_Taxon_Cite))
+# length(unique(only_latin)) == length(unique(oiseaux$Code_Ref))
+
+oiseaux$latin <- only_latin
+oiseaux$annee <- as.numeric(substr(oiseaux$Date, 1, 4))
+
+denombrement <- oiseaux %>%
+  group_by(Code_Maille, annee, latin) %>%
+  summarise(sum = sum(Denombrement_min, na.rm = TRUE), .groups = 'drop') %>%
+  arrange(desc(Code_Maille))
+
+denombrement$p <- rep(NA, nrow(denombrement))
+for (i in 1:nrow(denombrement)) {
+  numerator <- denombrement$sum[i]
+  denominator <- 
+    sum(denombrement$sum[which(denombrement$Code_Maille == denombrement$Code_Maille[i] 
+                               & denombrement$annee == denombrement$annee[i])])
+  denombrement$p[i] <- numerator / denominator
+}
+
+index <- denombrement %>%
+  group_by(Code_Maille, annee = factor(annee)) %>%
+  summarise(D1 = sum(p > 0, na.rm = TRUE), 
+            D2 = exp(-sum(p*log(p))), 
+            D3 = 1 / sum(p^2), .groups = 'drop') %>%
+  arrange(desc(Code_Maille))
+
+LUP <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
+index$MOS11 <- rep(NA, nrow(index))
+for (i in 1:nrow(index)) {
+  index$MOS11[i] <- LUP$MOS11[which(index$Code_Maille[i] == LUP$ID & LUP$BufferSize == 1000)]
+}
+
+par(mfrow = c(1, 3))
+ggplot(index, aes(x = MOS11, y = D1, color = annee)) +
+  geom_point(size = 2) +
+  labs(title = 'D1 en fonction de MOS11',
+       x = 'MOS11',
+       y = 'D1') +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+ggplot(index, aes(x = MOS11, y = D2, color = annee)) +
+  geom_point(size = 2) +
+  labs(title = 'D1 en fonction de MOS11',
+       x = 'MOS11',
+       y = 'D1') +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+ggplot(index, aes(x = MOS11, y = D3, color = annee)) +
+  geom_point(size = 2) +
+  labs(title = 'D1 en fonction de MOS11',
+       x = 'MOS11',
+       y = 'D1') +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+```{r}
+traits <- read.csv("data/traits-statut-IUCN-biodivercite.csv", header = TRUE)
+traits
+
+
+
+#on veut traiter la table dénombrement qu'on appelera denombrementCarte où il restera pour chaque maille et pour chaque année le top 3 des oiseaux les plus observés 
+
+denombrementCarte <- denombrement %>%
+  group_by(Code_Maille, annee) %>%
+  top_n(3, sum) %>%
+  arrange(Code_Maille, annee)
+
+#maintenant dans denombrementCarte on veut ajouter les informations sur les traits des oiseaux, notamment la variable Niveau.de.spécialisation depuis traits
+
+denombrementCarte <- denombrementCarte %>%
+  left_join(traits, by = c("latin" = "Nom.latin"))
+
+#je veux juste la variable Niveau.de.spécialisation et la variable sum
+
+denombrementCarte <- denombrementCarte %>%
+  select(Code_Maille, annee, latin, sum, Niveau.de.spécialisation)
+
+#on veut rajouter les variables x et y de LUP dans denombrementCarte pour chaque maille
+
+denombrementCarte <- denombrementCarte %>%
+  left_join(LUP, by = c("Code_Maille" = "ID"))
+
+denombrementCarte <- denombrementCarte %>%
+  select(Code_Maille, annee, latin, sum, Niveau.de.spécialisation, X, Y, MOS11)
+
+denombrementCarte
+
+denombrementCarte <- st_as_sf(denombrementCarte, coords = c("X", "Y"), crs = 2154)
+denombrementCarte <- st_transform(denombrementCarte, crs = 4326)
+
+#pour chaque maille, on veut qu'une ligne par maile et par année et pour le top trois, faire 3 colonnes nomlatin1, sum1, nomlatin2, sum2, nomlatin3, sum3
+
+```
+
+
+# Créer une chaîne de caractères pour les popups avec le top 3 des noms latins
+denombrementCarte$popup_text <- paste0("<strong>Maille:</strong> ", denombrementCarte$Code_Maille, "<br>",
+                                      "<strong>Top 3 des noms latins:</strong>", "<br>",
+                                      denombrementCarte$nomlatin1, " (", denombrementCarte$sum1, ")", "<br>",
+                                      denombrementCarte$nomlatin2, " (", denombrementCarte$sum2, ")", "<br>",
+                                      denombrementCarte$nomlatin3, " (", denombrementCarte$sum3, ")")
+
+
+
+
+
+```
+
+
+```{r}
+library(leaflet)
+
+pal <- colorNumeric("viridis", domain = denombrementCarte$MOS11)
+
+leaflet(data = denombrementCarte) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addCircles(radius = 300, color = ~pal(MOS11), fillOpacity = 0.2) %>%
+  addLegend("bottomright", pal = pal, values = ~MOS11, title = "MOS11", position = "bottomright") %>%
+  addScaleBar(position = "bottomleft")
+
+# Créer la carte avec leaflet
+leaflet(data = denombrementCarte) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addCircles(radius = 300, color = ~pal(MOS11), fillOpacity = 0.2, popup = ~popup_text) %>%  # Ajouter les popups
+  addLegend("bottomright", pal = pal, values = ~MOS11, title = "MOS11", position = "bottomright") %>%
+  addScaleBar(position = "bottomleft")
+
+
+```
+
+
+
+
+
+

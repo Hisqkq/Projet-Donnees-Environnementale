@@ -20,6 +20,7 @@ library(sf)
 library(ggspatial)
 ```
 
+
 ```{r}
 oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
 # CREATE A NEW COLUMN IN THE OISEAUX DATAFRAME THAT CONTAINS THE LATIN NAME OF THE BIRD
@@ -36,6 +37,27 @@ only_latin <- my_split(as.vector(oiseaux$Nom_Taxon_Cite))
 
 oiseaux$latin <- only_latin
 oiseaux$annee <- as.numeric(substr(oiseaux$Date, 1, 4))
+```
+
+
+
+```{r}
+# THE MOST FREQUENT BIRD SPECIES OBSERVED IN THE DATASET
+as.data.frame(sort(table(oiseaux$latin), decreasing = TRUE)[1:10])
+```
+
+```{r}
+# FREQUENCY OF BIRD SPECIES OBSERVED IN THE DATASET BY YEAR
+Annee <- my_split(as.vector(oiseaux$Date), str = "-")
+oiseaux$Annee <- as.factor(Annee)
+as.data.frame.matrix(table(oiseaux$latin, oiseaux$Annee))
+```
+
+
+
+
+```{r}
+## Analyse de diversité par rapport à MOS11 et par année
 
 denombrement <- oiseaux %>%
   group_by(Code_Maille, annee, latin) %>%
@@ -75,7 +97,7 @@ ggplot(index, aes(x = MOS11, y = D1, color = annee)) +
 
 ggplot(index, aes(x = MOS11, y = D2, color = annee)) +
   geom_point(size = 2) +
-  labs(title = 'D1 en fonction de MOS11',
+  labs(title = 'D2 en fonction de MOS11',
        x = 'MOS11',
        y = 'D1') +
   theme_minimal() +
@@ -83,10 +105,42 @@ ggplot(index, aes(x = MOS11, y = D2, color = annee)) +
 
 ggplot(index, aes(x = MOS11, y = D3, color = annee)) +
   geom_point(size = 2) +
-  labs(title = 'D1 en fonction de MOS11',
+  labs(title = 'D3 en fonction de MOS11',
        x = 'MOS11',
        y = 'D1') +
   theme_minimal() +
   theme(legend.position = "bottom")
 ```
+
+```{r}
+ggplot(index, aes(x = MOS11, y = D1, color = as.factor(annee))) +
+  geom_point(size = 2) +
+  geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
+  labs(title = 'D1 en fonction de MOS11',
+       x = 'MOS11',
+       y = 'D1') +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+ggplot(index, aes(x = MOS11, y = D2, color = as.factor(annee))) +
+  geom_point(size = 2) +
+  geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
+  labs(title = 'D2 en fonction de MOS11',
+       x = 'MOS11',
+       y = 'D2') +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+ggplot(index, aes(x = MOS11, y = D3, color = as.factor(annee))) +
+  geom_point(size = 2) +
+  geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
+  labs(title = 'D3 en fonction de MOS11',
+       x = 'MOS11',
+       y = 'D3') +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+```
+
+
 

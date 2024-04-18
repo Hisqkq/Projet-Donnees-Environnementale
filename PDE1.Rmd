@@ -228,29 +228,6 @@ top_species_by_temperature <- species_by_temperature %>%
 top_species_by_temperature
 ```
 
-
----
-title: "Projet stat pour données environnementales"
-author: "Louis Delignac, Baptiste Gerbouin, Théo Lavandier, Alexandre Leys, Hamad Tria"
-date: "`r format(Sys.Date(), '%d %B, %Y')`"
-output:
-  pdf_document:
-    toc: true
-    toc_depth: 2
-    number_sections: true
-    df_print: kable
-    highlight: tango
----
-
-```{r setup, message=FALSE, echo=FALSE}
-# install.packages("tidyverse")
-library(tidyverse)
-library(ggplot2)
-library(kableExtra)
-library(sf)
-library(ggspatial)
-```
-
 ```{r}
 oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
 LUP <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)

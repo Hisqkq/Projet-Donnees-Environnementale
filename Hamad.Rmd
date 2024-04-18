@@ -44,8 +44,6 @@ oiseaux$latin <- only_latin
 oiseaux$annee <- as.numeric(substr(oiseaux$Date, 1, 4))
 ```
 
-
-
 ```{r}
 # THE MOST FREQUENT BIRD SPECIES OBSERVED IN THE DATASET
 as.data.frame(sort(table(oiseaux$latin), decreasing = TRUE)[1:10])
@@ -177,16 +175,6 @@ ggplot(data, aes(x=MOS11, y=sum, color=Annee)) +
       geom_point(size=2) 
 ```
 
-
-
-
-
-
-
-
-## On fait la maaaaaaaaaaaaaap
-
-
 ```{r}
 traits <- read.csv("data/traits-statut-IUCN-biodivercite.csv", header = TRUE)
 cite <- read.csv("data/BiodiverCite_sites.csv", header = TRUE, sep=";")
@@ -298,7 +286,6 @@ my_split <- function(array, str = " \\| ") {
 }
 
 only_latin <- my_split(as.vector(oiseaux$Nom_Taxon_Cite))
-# length(unique(only_latin)) == length(unique(oiseaux$Code_Ref))
 
 oiseaux$latin <- only_latin
 oiseaux$annee <- as.numeric(substr(oiseaux$Date, 1, 4))
@@ -366,21 +353,33 @@ no_info <- c("Himantopus himantopus", "Tringa ochropus",
              "Caprimulgus europaeus", "Lanius senator", 
              "Dryocopus martius", "Emberiza calandra")
 
-alimentation <- read.csv("traits-statut-IUCN-biodivercite.csv", header = TRUE)
+alimentation <- read.csv("data/traits-statut-IUCN-biodivercite.csv", header = TRUE)
 denombrement$regime_alimentaire <- rep(NA, nrow(denombrement))
+denombrement$niveau_de_specialisation <- rep(NA, nrow(denombrement))
 for (i in 1:nrow(denombrement)) {
   if (denombrement$latin[i] %in% no_info){
     denombrement$regime_alimentaire[i] <- NA
+    denombrement$niveau_de_specialisation[i] <- NA
   }
   else {
     denombrement$regime_alimentaire[i] <- 
       alimentation$Régime.alimentaire[which(alimentation$Nom.latin == denombrement$latin[i])]
+    denombrement$niveau_de_specialisation[i] <- 
+      alimentation$Niveau.de.spécialisation[which(alimentation$Nom.latin == denombrement$latin[i])]
   }
 }
 denombrement$regime_alimentaire <- as.factor(denombrement$regime_alimentaire)
+denombrement$niveau_de_specialisation <- as.factor(denombrement$niveau_de_specialisation)
 
-plot_data = function (data, title) {
+plot_data1 = function (data, title) {
     ggplot(data, aes(x="", y=sum, fill=regime_alimentaire)) +
+    geom_bar(stat="identity", width=0.1) +
+    coord_polar("y", start=0) +
+    ggtitle(paste("Station: ", as.character(title))) +
+    theme_void()
+}
+plot_data2 = function (data, title) {
+    ggplot(data, aes(x="", y=sum, fill=niveau_de_specialisation)) +
     geom_bar(stat="identity", width=0.1) +
     coord_polar("y", start=0) +
     ggtitle(paste("Station: ", as.character(title))) +
@@ -388,14 +387,20 @@ plot_data = function (data, title) {
 }
 
 N <- length(unique(denombrement$Code_Maille))
-p <- vector("list", length = N)
+p1 <- vector("list", length = N)
+p2 <- vector("list", length = N)
 
 for (i in 1:N) {
     data <- denombrement[which(denombrement$Code_Maille == unique(denombrement$Code_Maille)[i]),]
-    data <- data %>% group_by(regime_alimentaire) %>% summarise(sum = sum(p, na.rm = TRUE))
-    p[[i]] <- plot_data(data, unique(denombrement$Code_Maille)[i])
+    data1 <- data %>% group_by(regime_alimentaire) %>% summarise(sum = sum(p, na.rm = TRUE))
+    data2 <- data %>% group_by(niveau_de_specialisation) %>% summarise(sum = sum(p, na.rm = TRUE))
+    p1[[i]] <- plot_data1(data1, unique(denombrement$Code_Maille)[i])
+    p2[[i]] <- plot_data2(data2, unique(denombrement$Code_Maille)[i])
 }
+```
 
+
+```{r}
 coordinates <- st_as_sf(LUP, coords = c("X", "Y"), crs = 2154)
 coordinates <- st_transform(coordinates, crs = 4326)
 coordinates <- coordinates[coordinates$BufferSize == 500,]
@@ -416,8 +421,20 @@ leaflet(data = coordinates) %>%
              fillOpacity = 0.5, group = "pnt") %>%
   addLegend("bottomright", pal = pal, values = coordinates$MOS11, title = "MOS11") %>%
   addScaleBar(position = "bottomleft") %>% 
-  addPopupGraphs(p, width = 200, height = 200, group = "pnt")
+  addPopupGraphs(p1, width = 200, height = 200, group = "pnt")
 ```
+
+```{r}
+pal <- colorNumeric("viridis", domain = coordinates$MOS11)
+leaflet(data = coordinates) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addCircles(radius = 300, color = ~pal(MOS11), 
+             fillOpacity = 0.5, group = "pnt") %>%
+  addLegend("bottomright", pal = pal, values = coordinates$MOS11, title = "MOS11") %>%
+  addScaleBar(position = "bottomleft") %>% 
+  addPopupGraphs(p2, width = 200, height = 200, group = "pnt")
+```
+
 
 
 

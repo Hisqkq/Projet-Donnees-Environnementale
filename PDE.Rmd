@@ -1,0 +1,441 @@
+---
+title: "Projet stat pour données environnementales"
+author: "Louis Delignac, Baptiste Gerbouin, Théo Lavandier, Alexandre Leys, Hamad Tria"
+date: "`r format(Sys.Date(), '%d %B, %Y')`"
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 2
+    number_sections: true
+    df_print: kable
+    highlight: tango
+---
+
+```{r setup, message=FALSE, echo=FALSE}
+# install.packages("tidyverse")
+library(tidyverse)
+library(ggplot2)
+library(kableExtra)
+library(sf)
+library(ggspatial)
+```
+
+
+```{r}
+oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
+# CREATE A NEW COLUMN IN THE OISEAUX DATAFRAME THAT CONTAINS THE LATIN NAME OF THE BIRD
+my_split <- function(array, str = " \\| ") {
+  out <- rep(NA, length(array))
+  for (i in 1:length(array)) {
+    out[i] <- unlist(strsplit(array[i], str))[1]
+  }
+  return (out)
+}
+
+only_latin <- my_split(as.vector(oiseaux$Nom_Taxon_Cite))
+# length(unique(only_latin)) == length(unique(oiseaux$Code_Ref))
+
+oiseaux$latin <- only_latin
+oiseaux$annee <- as.numeric(substr(oiseaux$Date, 1, 4))
+```
+
+
+
+```{r}
+# THE MOST FREQUENT BIRD SPECIES OBSERVED IN THE DATASET
+as.data.frame(sort(table(oiseaux$latin), decreasing = TRUE)[1:10])
+```
+
+```{r}
+# FREQUENCY OF BIRD SPECIES OBSERVED IN THE DATASET BY YEAR
+Annee <- my_split(as.vector(oiseaux$Date), str = "-")
+oiseaux$Annee <- as.factor(Annee)
+as.data.frame.matrix(table(oiseaux$latin, oiseaux$Annee))
+```
+
+
+
+
+```{r}
+## Analyse de diversité par rapport à MOS11 et par année
+
+denombrement <- oiseaux %>%
+  group_by(Code_Maille, annee, latin) %>%
+  summarise(sum = sum(Denombrement_min, na.rm = TRUE), .groups = 'drop') %>%
+  arrange(desc(Code_Maille))
+
+denombrement$p <- rep(NA, nrow(denombrement))
+for (i in 1:nrow(denombrement)) {
+  numerator <- denombrement$sum[i]
+  denominator <- 
+    sum(denombrement$sum[which(denombrement$Code_Maille == denombrement$Code_Maille[i] 
+                               & denombrement$annee == denombrement$annee[i])])
+  denombrement$p[i] <- numerator / denominator
+}
+
+index <- denombrement %>%
+  group_by(Code_Maille, annee = factor(annee)) %>%
+  summarise(D1 = sum(p > 0, na.rm = TRUE), 
+            D2 = exp(-sum(p*log(p))), 
+            D3 = 1 / sum(p^2), .groups = 'drop') %>%
+  arrange(desc(Code_Maille))
+
+LUP <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
+index$MOS11 <- rep(NA, nrow(index))
+for (i in 1:nrow(index)) {
+  index$MOS11[i] <- LUP$MOS11[which(index$Code_Maille[i] == LUP$ID & LUP$BufferSize == 500)]
+}
+
+par(mfrow = c(1, 3))
+ggplot(index, aes(x = MOS11, y = D1, color = as.factor(annee))) +
+  geom_point(size = 2) +
+  geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
+  labs(title = 'D1 en fonction de MOS11',
+       x = 'MOS11',
+       y = 'D1') +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+ggplot(index, aes(x = MOS11, y = D2, color = as.factor(annee))) +
+  geom_point(size = 2) +
+  geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
+  labs(title = 'D2 en fonction de MOS11',
+       x = 'MOS11',
+       y = 'D2') +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+ggplot(index, aes(x = MOS11, y = D3, color = as.factor(annee))) +
+  geom_point(size = 2) +
+  geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
+  labs(title = 'D3 en fonction de MOS11',
+       x = 'MOS11',
+       y = 'D3') +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+
+
+
+```{r}
+oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
+LUP <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
+```
+
+```{r}
+# CREATE A NEW COLUMN IN THE OISEAUX DATAFRAME THAT CONTAINS THE LATIN NAME OF THE BIRD
+# THE LATIN NAME IS THE FIRST NAME IN THE "Nom_Taxon_Cite" COLUMN
+# IF THE NAME CONTAINS A "|", THE LATIN NAME IS THE FIRST NAME BEFORE THE "|"
+
+# Split the names
+my_split <- function(array, str = " \\| ") {
+  out <- rep(NA, length(array))
+  for (i in 1:length(array)) {
+    out[i] <- unlist(strsplit(array[i], str))[1]
+  }
+  return (out)
+}
+
+# Test the function
+only_latin <- my_split(as.vector(oiseaux$Nom_Taxon_Cite))
+length(unique(only_latin)) == length(unique(oiseaux$Code_Ref))
+
+# Add the new column to the dataframe
+oiseaux$latin <- only_latin
+```
+
+```{r}
+# CREATE A NEW COLUMN IN THE OISEAUX DATAFRAME THAT CONTAINS THE MOS11 VALUE OF THE POINT
+filter <- LUP$BufferSize == 500
+LUP_500_MOS11 <- LUP[filter,c("Geometry", "ID", "X", "Y", "BufferSize", "MOS11")]
+rownames(LUP_500_MOS11) <- 1:nrow(LUP_500_MOS11)
+LUP_500_MOS11[, c("ID","MOS11")]
+
+MOS11 <- rep(NA, nrow(oiseaux))
+for (i in 1:nrow(oiseaux)) {
+  MOS11[i] <- which(oiseaux$Code_Maille[i] == LUP_500_MOS11$ID)
+}
+
+# Add the new column to the dataframe
+oiseaux$MOS11 <- LUP_500_MOS11$MOS11[MOS11]
+```
+
+```{r}
+# THE NUMBER OF BIRDS OBSERVED IN EACH MOS11 AREA BY YEAR
+data <- oiseaux %>%
+  group_by(Code_Maille, Annee, MOS11) %>%
+  select(Denombrement_min) %>% 
+  summarise(sum = sum(Denombrement_min, na.rm = TRUE))
+
+ggplot(data, aes(x=MOS11, y=sum, color=Annee)) +
+      geom_point(size=2) 
+```
+
+
+
+
+
+
+
+
+## On fait la maaaaaaaaaaaaaap
+
+
+```{r}
+traits <- read.csv("data/traits-statut-IUCN-biodivercite.csv", header = TRUE)
+cite <- read.csv("data/BiodiverCite_sites.csv", header = TRUE, sep=";")
+
+#on veut traiter la table dénombrement qu'on appelera denombrementCarte où il restera pour chaque maille et pour chaque année le top 3 des oiseaux les plus observés sans la variable p
+
+denombrementCarte <- denombrement %>%
+  group_by(Code_Maille, annee) %>%
+  top_n(3, sum) %>%
+  arrange(Code_Maille, annee, desc(sum)) %>%
+  ungroup() %>%
+  select(-p)
+
+
+#on veut changer cette table pour faire apparaitre de nouvelles colonnes pour qu'il y ait : une ligne par maille et par année, et pour chaque oiseau, le nombre d'individus observés
+
+denombrementCarte <- denombrementCarte %>%
+  pivot_wider(names_from = latin, values_from = sum, values_fill = 0)
+
+
+#on veut ajouter les colonnes geometry, buffer size et MOS11 à la table denombrementCarte et pas les autres
+
+denombrementCarte <- left_join(denombrementCarte, LUP, by = c("Code_Maille" = "ID"))
+
+#on enlève les colonnes : MOS1, MOS2, MOS3, MOS4, MOS5, MOS6, MOS7, MOS8, MOS9, MOS10, MOS12, MOS13, MOS14
+
+denombrementCarte <- denombrementCarte %>%
+  select(-c(MOS1, MOS2, MOS3, MOS4, MOS5, MOS6, MOS7, MOS8, MOS9, MOS10, MOS12, MOS13, MOS14))
+
+# On garde que les lignes ou BufferSize == 500
+denombrementCarte <- denombrementCarte %>%
+  filter(BufferSize == 500)
+
+denombrementCarte <- st_as_sf(denombrementCarte, coords = c("X", "Y"), crs = 2154)
+denombrementCarte <- st_transform(denombrementCarte, crs = 4326)
+
+# On garde seuelement les valeurs ou annee = 2018
+
+denombrementCarte <- denombrementCarte %>%
+  filter(annee == 2023)
+
+denombrementCarte
+
+```
+
+
+
+```{r}
+
+library(leaflet.extras)
+
+# On garder que les colonnes qui nous intéressent, cad code_site et Nom_lieu
+
+
+cite <- cite %>%
+  select(code_site, Nom_lieu)
+
+#On join les deux tables cite et denombrementCarte
+
+denombrementCarte <- left_join(denombrementCarte, cite, by = c("Code_Maille" = "code_site"))
+
+# Créer une chaîne de caractères pour les popups avec le top trois des oiseaux ayant la plus grande valeur
+denombrementCarte$popup_text <- paste0("<strong>Maille:</strong> ", denombrementCarte$Nom_lieu, "<br>",
+                                      "<strong>Année:</strong> ", denombrementCarte$annee, "<br>",
+                                      "<strong>Top 3 des oiseaux:</strong>", "<br>")
+
+dataframe <- as.data.frame(denombrementCarte)
+dataframe
+
+# On enleve les colonnes Code_Maille, annee, BufferSize, MOS11, Geometry, geometry
+dataframe <- dataframe %>%
+  select(-c(Code_Maille, annee, BufferSize, MOS11, Geometry, geometry, Nom_lieu))
+
+# Ajouter les noms des oiseaux et leurs valeurs au popup_text pour chaque ligne
+for (i in 1:nrow(dataframe)) {
+  top_birds <- sort(unlist(dataframe[i, -c(ncol(dataframe))]), decreasing = TRUE)[1:3]
+  top_bird_names <- names(top_birds)
+  denombrementCarte$popup_text[i] <- paste0(denombrementCarte$popup_text[i],
+                                            top_bird_names[1], ": ", top_birds[1], " - ", traits[which(traits$Nom.latin == top_bird_names[1]), "Niveau.de.spécialisation"], "<br>",
+                                            top_bird_names[2], ": ", top_birds[2], " - ", traits[which(traits$Nom.latin == top_bird_names[2]), "Niveau.de.spécialisation"], "<br>",
+                                            top_bird_names[3], ": ", top_birds[3], " - ", traits[which(traits$Nom.latin == top_bird_names[3]), "Niveau.de.spécialisation"])
+}
+
+pal <- colorNumeric("viridis", domain = denombrementCarte$MOS11)
+
+
+leaflet(data = denombrementCarte) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addCircles(radius = 300, color = ~pal(MOS11), fillOpacity = 0.2, popup = ~popup_text) %>%
+  addLegend("bottomright", pal = pal, values = ~MOS11, title = "MOS11", position = "bottomright") %>%
+  addScaleBar(position = "bottomleft")
+
+
+
+```
+
+
+
+
+
+```{r setup, message=FALSE, echo=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(kableExtra)
+library(sf)
+library(ggspatial)
+library(leaflet)
+library(leafpop)
+library(lattice)
+```
+
+```{r}
+oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
+# CREATE A NEW COLUMN IN THE OISEAUX DATAFRAME THAT CONTAINS THE LATIN NAME OF THE BIRD
+my_split <- function(array, str = " \\| ") {
+  out <- rep(NA, length(array))
+  for (i in 1:length(array)) {
+    out[i] <- unlist(strsplit(array[i], str))[1]
+  }
+  return (out)
+}
+
+only_latin <- my_split(as.vector(oiseaux$Nom_Taxon_Cite))
+# length(unique(only_latin)) == length(unique(oiseaux$Code_Ref))
+
+oiseaux$latin <- only_latin
+oiseaux$annee <- as.numeric(substr(oiseaux$Date, 1, 4))
+
+denombrement <- oiseaux %>%
+  group_by(Code_Maille, annee, latin) %>%
+  summarise(sum = sum(Denombrement_min, na.rm = TRUE), .groups = 'drop') %>%
+  arrange(desc(Code_Maille))
+
+denombrement$p <- rep(NA, nrow(denombrement))
+for (i in 1:nrow(denombrement)) {
+  numerator <- denombrement$sum[i]
+  denominator <- 
+    sum(denombrement$sum[which(denombrement$Code_Maille == denombrement$Code_Maille[i] 
+                               & denombrement$annee == denombrement$annee[i])])
+  denombrement$p[i] <- numerator / denominator
+}
+
+index <- denombrement %>%
+  group_by(Code_Maille, annee = factor(annee)) %>%
+  summarise(D1 = sum(p > 0, na.rm = TRUE), 
+            D2 = exp(-sum(p*log(p))), 
+            D3 = 1 / sum(p^2), .groups = 'drop') %>%
+  arrange(desc(Code_Maille))
+
+LUP <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
+index$MOS11 <- rep(NA, nrow(index))
+for (i in 1:nrow(index)) {
+  index$MOS11[i] <- LUP$MOS11[which(index$Code_Maille[i] == LUP$ID & LUP$BufferSize == 500)]
+}
+
+par(mfrow = c(1, 3))
+ggplot(index, aes(x = MOS11, y = D1, color = annee)) +
+  geom_point(size = 2) +
+  labs(title = 'D1 en fonction de MOS11',
+       x = 'MOS11',
+       y = 'D1') +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+ggplot(index, aes(x = MOS11, y = D2, color = annee)) +
+  geom_point(size = 2) +
+  labs(title = 'D1 en fonction de MOS11',
+       x = 'MOS11',
+       y = 'D1') +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+ggplot(index, aes(x = MOS11, y = D3, color = annee)) +
+  geom_point(size = 2) +
+  labs(title = 'D1 en fonction de MOS11',
+       x = 'MOS11',
+       y = 'D1') +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+```{r}
+# changed the unmatchinng latin names to the correct ones to match alimentation
+denombrement$latin[denombrement$latin == "Carduelis chloris"] <- "Chloris chloris"
+denombrement$latin[denombrement$latin == "Carduelis spinus"] <- "Spinus spinus"
+denombrement$latin[denombrement$latin == "Casmerodius albus"] <- "Ardea alba"
+denombrement$latin[denombrement$latin == "Carduelis cannabina"] <- "Linaria cannabina"
+no_info <- c("Himantopus himantopus", "Tringa ochropus", 
+             "Caprimulgus europaeus", "Lanius senator", 
+             "Dryocopus martius", "Emberiza calandra")
+
+alimentation <- read.csv("traits-statut-IUCN-biodivercite.csv", header = TRUE)
+denombrement$regime_alimentaire <- rep(NA, nrow(denombrement))
+for (i in 1:nrow(denombrement)) {
+  if (denombrement$latin[i] %in% no_info){
+    denombrement$regime_alimentaire[i] <- NA
+  }
+  else {
+    denombrement$regime_alimentaire[i] <- 
+      alimentation$Régime.alimentaire[which(alimentation$Nom.latin == denombrement$latin[i])]
+  }
+}
+denombrement$regime_alimentaire <- as.factor(denombrement$regime_alimentaire)
+
+plot_data = function (data, title) {
+    ggplot(data, aes(x="", y=sum, fill=regime_alimentaire)) +
+    geom_bar(stat="identity", width=0.1) +
+    coord_polar("y", start=0) +
+    ggtitle(paste("Station: ", as.character(title))) +
+    theme_void()
+}
+
+N <- length(unique(denombrement$Code_Maille))
+p <- vector("list", length = N)
+
+for (i in 1:N) {
+    data <- denombrement[which(denombrement$Code_Maille == unique(denombrement$Code_Maille)[i]),]
+    data <- data %>% group_by(regime_alimentaire) %>% summarise(sum = sum(p, na.rm = TRUE))
+    p[[i]] <- plot_data(data, unique(denombrement$Code_Maille)[i])
+}
+
+coordinates <- st_as_sf(LUP, coords = c("X", "Y"), crs = 2154)
+coordinates <- st_transform(coordinates, crs = 4326)
+coordinates <- coordinates[coordinates$BufferSize == 500,]
+
+# Remove the coordinates that are not in denombrement
+for (i in seq_along(coordinates$ID)){
+  if (!(coordinates$ID[i] %in% unique(denombrement$Code_Maille))){
+    coordinates <- coordinates[-i,]
+  }
+}
+
+coordinates <- coordinates[order(coordinates$ID, decreasing = TRUE),]
+
+pal <- colorNumeric("viridis", domain = coordinates$MOS11)
+leaflet(data = coordinates) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addCircles(radius = 300, color = ~pal(MOS11), 
+             fillOpacity = 0.5, group = "pnt") %>%
+  addLegend("bottomright", pal = pal, values = coordinates$MOS11, title = "MOS11") %>%
+  addScaleBar(position = "bottomleft") %>% 
+  addPopupGraphs(p, width = 200, height = 200, group = "pnt")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+

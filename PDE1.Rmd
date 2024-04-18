@@ -12,12 +12,17 @@ output:
 ---
 
 ```{r setup, message=FALSE, echo=FALSE}
-# install.packages("tidyverse")
+
 library(tidyverse)
 library(ggplot2)
 library(kableExtra)
 library(sf)
 library(ggspatial)
+library(leaflet)
+library(leafpop)
+library(lattice)
+library(leaflet.extras)
+
 ```
 
 
@@ -231,8 +236,6 @@ denombrementCarte
 
 ```{r}
 
-library(leaflet.extras)
-
 # On garder que les colonnes qui nous intéressent, cad code_site et Nom_lieu
 
 
@@ -282,16 +285,6 @@ leaflet(data = denombrementCarte) %>%
 
 
 
-```{r setup, message=FALSE, echo=FALSE}
-library(tidyverse)
-library(ggplot2)
-library(kableExtra)
-library(sf)
-library(ggspatial)
-library(leaflet)
-library(leafpop)
-library(lattice)
-```
 
 ```{r}
 oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")

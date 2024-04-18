@@ -1,0 +1,100 @@
+---
+title: "BaptisteBranch"
+output: html_document
+date: "2024-04-18"
+---
+
+## L'objectif de cette section est de comparer les réponses de la biodiversité à différents types d'usage des sols.
+
+Pour ce faire on va prendre trois autres usages des sols pour faire notre comparaison. 
+
+A savoir : 
+
+MOS3 : Vegetation (bois) urbaine
+MOS8 : Vignes
+MOS10 : Réseau hydrique
+
+
+
+La biodiversité réagit-elle a d’autres catégories d’usage des sols? Quelles précautions prendre pour
+incorporer des variables multiples?
+
+
+
+```{r}
+
+library(tidyverse)
+library(ggplot2)
+library(kableExtra)
+library(sf)
+library(ggspatial)
+
+```
+
+
+```{r}
+oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
+LUP <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
+traits <- read.csv("data/traits-statut-IUCN-biodivercite.csv", header = TRUE)
+cite <- read.csv("data/BiodiverCite_sites.csv", header = TRUE, sep=";")
+```
+Analyse pour MOS10
+
+```{r}
+#on va afficher sur la map les mailles où l'usage du sol est le réseau hydrique
+
+MOS10 <- LUP %>%
+  select(ID, X, Y, MOS10)
+
+MOS10 <- st_as_sf(MOS10, coords = c("X", "Y"), crs = 2154)
+MOS10 <- st_transform(MOS10, crs = 4326)
+
+MOS10
+
+
+pal <- colorNumeric("viridis", domain = MOS10$MOS10)
+
+
+leaflet(data = MOS10) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addCircles(radius = 300, color = ~pal(MOS10), fillOpacity = 0.2) %>%
+  addLegend("bottomright", pal = pal, values = ~MOS10, title = "MOS10", position = "bottomright") %>%
+  addScaleBar(position = "bottomleft")
+
+
+
+
+```
+
+Faire une ACP en fonction des MOS
+
++ Analyse de toutes les especes en fonction d'un milieu
++ Analyse d'une espece particuliere en fonction de son milieu
++ pourquoi pas : analyse d'une espece en fonction de plusieurs milieux
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

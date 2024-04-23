@@ -36,7 +36,7 @@ library(ggspatial)
 oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
 LUP <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
 traits <- read.csv("data/traits-statut-IUCN-biodivercite.csv", header = TRUE)
-cite <- read.csv("data/BiodiverCite_sites.csv", header = TRUE, sep=";")
+cite <- read.csv("data/BiodiverCite_sites.csv", header = TRUE, sep = ";")
 ```
 Analyse pour MOS10
 
@@ -58,12 +58,11 @@ pal <- colorNumeric("viridis", domain = MOS10$MOS10)
 leaflet(data = MOS10) %>%
   addProviderTiles("CartoDB.Positron") %>%
   addCircles(radius = 300, color = ~pal(MOS10), fillOpacity = 0.2) %>%
-  addLegend("bottomright", pal = pal, values = ~MOS10, title = "MOS10", position = "bottomright") %>%
+  addLegend(
+    "bottomright", pal = pal, values = ~MOS10,
+    title = "MOS10", position = "bottomright"
+  ) %>%
   addScaleBar(position = "bottomleft")
-
-
-
-
 ```
 
 Faire une ACP en fonction des MOS

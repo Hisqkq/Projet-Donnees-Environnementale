@@ -3,23 +3,49 @@ title: "Projet stat pour données environnementales"
 author: "Louis Delignac, Baptiste Gerbouin, Théo Lavandier, Alexandre Leys, Hamad Tria"
 date: "`r format(Sys.Date(), '%d %B, %Y')`"
 output:
-  pdf_document:
-    toc: true
-    toc_depth: 2
-    number_sections: true
-    df_print: kable
+  html_document:
+    code_folding: hide
+    code_download: true
+    theme: united
     highlight: tango
+    df_print: paged
+    toc: true
+    toc_float: true
+    toc_depth: 2
+  # pdf_document:
+  #   toc: true
+  #   toc_depth: 2
+  #   number_sections: true
+  #   df_print: kable
+  #   highlight: tango
 ---
 
-```{r setup, message=FALSE, echo=FALSE}
-# install.packages("tidyverse")
-library(tidyverse)
-library(ggplot2)
-library(kableExtra)
-library(sf)
-library(ggspatial)
+<style>
+  .tocify-extend-page {
+    display: none;
+  }
+</style>
+
+```{r config, include=FALSE}
+knitr::opts_chunk$set(out.width = "100%")
 ```
 
+```{r setup, message=FALSE, echo=FALSE}
+# Packages de gestion des données
+library(tidyverse)
+library(sf)
+
+# Packages pour visualisation des données
+library(ggplot2)
+library(ggspatial)
+library(kableExtra)
+library(lattice)
+
+# Packages pour visualisation de cartes intéractives
+library(leaflet)
+library(leafpop)
+library(leaflet.extras)
+```
 
 ```{r}
 oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
@@ -56,7 +82,7 @@ as.data.frame.matrix(table(oiseaux$latin, oiseaux$Annee))
 
 
 
-```{r}
+```{r, message=FALSE}
 ## Analyse de diversité par rapport à MOS11 et par année
 
 denombrement <- oiseaux %>%
@@ -212,9 +238,6 @@ denombrementCarte
 
 
 ```{r}
-
-library(leaflet.extras)
-
 # On garder que les colonnes qui nous intéressent, cad code_site et Nom_lieu
 
 
@@ -255,25 +278,9 @@ leaflet(data = denombrementCarte) %>%
   addCircles(radius = 300, color = ~pal(MOS11), fillOpacity = 0.2, popup = ~popup_text) %>%
   addLegend("bottomright", pal = pal, values = ~MOS11, title = "MOS11", position = "bottomright") %>%
   addScaleBar(position = "bottomleft")
-
-
-
 ```
 
 
-
-
-
-```{r setup2, message=FALSE, echo=FALSE}
-library(tidyverse)
-library(ggplot2)
-library(kableExtra)
-library(sf)
-library(ggspatial)
-library(leaflet)
-library(leafpop)
-library(lattice)
-```
 
 ```{r}
 oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
@@ -486,7 +493,7 @@ coordinates <- st_transform(coordinates, crs = 4326)
 coordinates$Distance <- st_distance(coordinates, PeyBerland)
 ```
 
-```{r}
+```{r, message=FALSE}
 denombrement <- oiseaux %>%
   group_by(Code_Maille, annee, latin) %>%
   summarise(sum = sum(Denombrement_min, na.rm = TRUE), .groups = "drop") %>%
@@ -532,9 +539,7 @@ ggplot(index, aes(x = Distance, y = D2, color = as.factor(annee))) +
        y = "D2") +
   theme_minimal() +
   theme(legend.position = "bottom")
-```
 
-```{r}
 ggplot(index, aes(x = Distance, y = D3, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +

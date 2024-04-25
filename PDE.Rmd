@@ -45,6 +45,10 @@ library(lattice)
 library(leaflet)
 library(leafpop)
 library(leaflet.extras)
+
+#ACP
+library(FactoMineR)
+library(factoextra)
 ```
 
 ```{r}
@@ -548,4 +552,34 @@ ggplot(index, aes(x = Distance, y = D3, color = as.factor(annee))) +
        y = "D3") +
   theme_minimal() +
   theme(legend.position = "bottom")
+```
+
+# ACP
+
+```{r}
+pca_result <- PCA(LUP[, 6:19], scale.unit = TRUE, graph = FALSE)
+fviz_eig(
+  pca_result,
+  addlabels = TRUE,
+  ncp = 14
+)
+
+fviz_pca_var(
+  pca_result,
+  col.var = "contrib",
+  gradient.cols = rainbow(5),
+  legend.title = "Contribution (%)",
+  repel = TRUE
+)
+
+fviz_pca_ind(
+  pca_result,
+  repel = FALSE
+)
+
+fviz_pca_biplot(
+  pca_result,
+  repel = FALSE,
+  col.var = "#E50000"
+)
 ```

@@ -117,6 +117,9 @@ for (i in 1:nrow(index)) {
 }
 
 par(mfrow = c(1, 3))
+```
+
+```{r}
 ggplot(index, aes(x = MOS11, y = D1, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
@@ -125,7 +128,9 @@ ggplot(index, aes(x = MOS11, y = D1, color = as.factor(annee))) +
        y = "D1") +
   theme_minimal() +
   theme(legend.position = "bottom")
+```
 
+```{r}
 ggplot(index, aes(x = MOS11, y = D2, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
@@ -134,7 +139,9 @@ ggplot(index, aes(x = MOS11, y = D2, color = as.factor(annee))) +
        y = "D2") +
   theme_minimal() +
   theme(legend.position = "bottom")
+```
 
+```{r}
 ggplot(index, aes(x = MOS11, y = D3, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
@@ -144,6 +151,7 @@ ggplot(index, aes(x = MOS11, y = D3, color = as.factor(annee))) +
   theme_minimal() +
   theme(legend.position = "bottom")
 ```
+
 
 
 
@@ -191,7 +199,7 @@ for (i in 1:nrow(oiseaux)) {
 oiseaux$MOS11 <- LUP_500_MOS11$MOS11[MOS11]
 ```
 
-## On fait la maaaaaaaaaaaaaap
+## On fait la carte
 
 
 ```{r}
@@ -243,8 +251,6 @@ denombrementCarte
 
 ```{r}
 # On garder que les colonnes qui nous intéressent, cad code_site et Nom_lieu
-
-
 cite <- cite %>%
   select(code_site, Nom_lieu)
 
@@ -331,6 +337,9 @@ for (i in 1:nrow(index)) {
 }
 
 par(mfrow = c(1, 3))
+```
+
+```{r}
 ggplot(index, aes(x = MOS11, y = D1, color = annee)) +
   geom_point(size = 2) +
   labs(title = "D1 en fonction de MOS11",
@@ -338,7 +347,9 @@ ggplot(index, aes(x = MOS11, y = D1, color = annee)) +
        y = "D1") +
   theme_minimal() +
   theme(legend.position = "bottom")
+```
 
+```{r}
 ggplot(index, aes(x = MOS11, y = D2, color = annee)) +
   geom_point(size = 2) +
   labs(title = "D1 en fonction de MOS11",
@@ -346,7 +357,9 @@ ggplot(index, aes(x = MOS11, y = D2, color = annee)) +
        y = "D1") +
   theme_minimal() +
   theme(legend.position = "bottom")
+```
 
+```{r}
 ggplot(index, aes(x = MOS11, y = D3, color = annee)) +
   geom_point(size = 2) +
   labs(title = "D1 en fonction de MOS11",
@@ -355,6 +368,7 @@ ggplot(index, aes(x = MOS11, y = D3, color = annee)) +
   theme_minimal() +
   theme(legend.position = "bottom")
 ```
+
 
 ```{r}
 # changed the unmatchinng latin names to the correct ones to match alimentation
@@ -526,6 +540,9 @@ for (i in 1:nrow(index)) {
 }
 
 par(mfrow = c(1, 3))
+```
+
+```{r}
 ggplot(index, aes(x = Distance, y = D1, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
@@ -534,7 +551,9 @@ ggplot(index, aes(x = Distance, y = D1, color = as.factor(annee))) +
        y = "D1") +
   theme_minimal() +
   theme(legend.position = "bottom")
+```
 
+```{r}
 ggplot(index, aes(x = Distance, y = D2, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
@@ -543,7 +562,9 @@ ggplot(index, aes(x = Distance, y = D2, color = as.factor(annee))) +
        y = "D2") +
   theme_minimal() +
   theme(legend.position = "bottom")
+```
 
+```{r}
 ggplot(index, aes(x = Distance, y = D3, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
@@ -554,6 +575,7 @@ ggplot(index, aes(x = Distance, y = D3, color = as.factor(annee))) +
   theme(legend.position = "bottom")
 ```
 
+
 # ACP
 
 ```{r}
@@ -563,7 +585,9 @@ fviz_eig(
   addlabels = TRUE,
   ncp = 14
 )
+```
 
+```{r}
 fviz_pca_var(
   pca_result,
   col.var = "contrib",
@@ -571,12 +595,13 @@ fviz_pca_var(
   legend.title = "Contribution (%)",
   repel = TRUE
 )
+```
 
+```{r}
 fviz_pca_ind(
   pca_result,
   repel = FALSE
 )
-
 fviz_pca_biplot(
   pca_result,
   repel = FALSE,

@@ -1,2 +1,4 @@
 PDE_files/
 .Rhistory
+*.pyc
+__pycache__/

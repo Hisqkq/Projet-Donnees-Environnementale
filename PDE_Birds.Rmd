@@ -52,7 +52,7 @@ library(factoextra)
 ```
 
 ```{r}
-oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
+oiseaux <- read.csv("data/birds/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
 # CREATE A NEW COLUMN IN THE OISEAUX DATAFRAME THAT CONTAINS THE LATIN NAME OF THE BIRD
 my_split <- function(array, str = " \\| ") {
   out <- rep(NA, length(array))
@@ -110,7 +110,7 @@ index <- denombrement %>%
             D3 = 1 / sum(p^2), .groups = "drop") %>%
   arrange(desc(Code_Maille))
 
-LUP <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
+LUP <- read.csv("data/birds/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
 index$MOS11 <- rep(NA, nrow(index))
 for (i in 1:nrow(index)) {
   index$MOS11[i] <- LUP$MOS11[which(index$Code_Maille[i] == LUP$ID & LUP$BufferSize == 500)]
@@ -149,8 +149,8 @@ ggplot(index, aes(x = MOS11, y = D3, color = as.factor(annee))) +
 
 
 ```{r}
-oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
-LUP <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
+oiseaux <- read.csv("data/birds/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
+LUP <- read.csv("data/birds/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
 ```
 
 ```{r}
@@ -195,8 +195,8 @@ oiseaux$MOS11 <- LUP_500_MOS11$MOS11[MOS11]
 
 
 ```{r}
-traits <- read.csv("data/traits-statut-IUCN-biodivercite.csv", header = TRUE)
-cite <- read.csv("data/BiodiverCite_sites.csv", header = TRUE, sep = ";")
+traits <- read.csv("data/birds/traits-statut-IUCN-biodivercite.csv", header = TRUE)
+cite <- read.csv("data/birds/BiodiverCite_sites.csv", header = TRUE, sep = ";")
 
 #on veut traiter la table dénombrement qu"on appelera denombrementCarte où il restera pour chaque maille et pour chaque année le top 3 des oiseaux les plus observés sans la variable p
 
@@ -287,7 +287,7 @@ leaflet(data = denombrementCarte) %>%
 
 
 ```{r}
-oiseaux <- read.csv("data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
+oiseaux <- read.csv("data/birds/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
 # CREATE A NEW COLUMN IN THE OISEAUX DATAFRAME THAT CONTAINS THE LATIN NAME OF THE BIRD
 my_split <- function(array, str = " \\| ") {
   out <- rep(NA, length(array))
@@ -324,7 +324,7 @@ index <- denombrement %>%
             D3 = 1 / sum(p^2), .groups = "drop") %>%
   arrange(desc(Code_Maille))
 
-LUP <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
+LUP <- read.csv("data/birds/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
 index$MOS11 <- rep(NA, nrow(index))
 for (i in 1:nrow(index)) {
   index$MOS11[i] <- LUP$MOS11[which(index$Code_Maille[i] == LUP$ID & LUP$BufferSize == 500)]
@@ -366,7 +366,7 @@ no_info <- c("Himantopus himantopus", "Tringa ochropus",
              "Caprimulgus europaeus", "Lanius senator",
              "Dryocopus martius", "Emberiza calandra")
 
-alimentation <- read.csv("data/traits-statut-IUCN-biodivercite.csv", header = TRUE)
+alimentation <- read.csv("data/birds/traits-statut-IUCN-biodivercite.csv", header = TRUE)
 denombrement$regime_alimentaire <- rep(NA, nrow(denombrement))
 for (i in 1:nrow(denombrement)) {
   if (denombrement$latin[i] %in% no_info) {
@@ -519,7 +519,7 @@ index <- denombrement %>%
             D3 = 1 / sum(p^2), .groups = "drop") %>%
   arrange(desc(Code_Maille))
 
-LUP <- read.csv("data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
+LUP <- read.csv("data/birds/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
 index$Distance <- rep(NA, nrow(index))
 for (i in 1:nrow(index)) {
   index$Distance[i] <- coordinates$Distance[which(index$Code_Maille[i] == coordinates$ID & coordinates$BufferSize == 500)]

@@ -629,43 +629,43 @@ plot_ly(data.frame(), type = "parcoords", line = list(color = "blue"), height = 
   dimensions = list(
     list(
       label = "Espèces",
-      range = c(1, length(birds_info[, "Nom.latin"])),
+      range = c(0, length(birds_info[, "Nom.latin"]) + 1),
       tickvals = 1:length(birds_info[, "Nom.latin"]),
       ticktext = birds_info[, "Nom.latin"],
       values = 1:length(birds_info[, "Nom.latin"])
     ),
     list(
       label = "Technique d'alimentation",
-      range = c(1, length(unique_technique)),
-      tickvals = 1:length(unique_technique),
+      range = c(0, length(unique_technique) + 1),
+      tickvals = as.numeric(factor(unique_technique)),
       ticktext = unique_technique,
       values = as.numeric(factor(birds_info[, "Technique.d.alimentation"]))
     ),
     list(
       label = "Nidification",
-      range = c(1, length(unique_nidi)),
-      tickvals = 1:length(unique_nidi),
+      range = c(0, length(unique_nidi) + 1),
+      tickvals = as.numeric(factor(unique_nidi)),
       ticktext = unique_nidi,
       values = as.numeric(factor(birds_info[, "Nidification"]))
     ),
     list(
       label = "Niveau de spécialisation",
-      range = c(1, length(unique_level)),
-      tickvals = 1:length(unique_level),
+      range = c(0, length(unique_level) + 1),
+      tickvals = as.numeric(factor(unique_level)),
       ticktext = unique_level,
       values = as.numeric(factor(birds_info[, "Niveau.de.spécialisation"]))
     ),
     list(
       label = "Période de migration",
-      range = c(1, length(unique_migration)),
-      tickvals = 1:length(unique_migration),
+      range = c(0, length(unique_migration) + 1),
+      tickvals = as.numeric(factor(unique_migration)),
       ticktext = unique_migration,
       values = as.numeric(factor(birds_info[, "Période.de.migration"]))
     ),
     list(
       label = "Régime alimentaire",
-      range = c(1, length(unique_regime)),
-      tickvals = 1:length(unique_regime),
+      range = c(0, length(unique_regime) + 1),
+      tickvals = as.numeric(factor(unique_regime)),
       ticktext = unique_regime,
       values = as.numeric(factor(birds_info[, "Régime.alimentaire"]))
     )
@@ -674,4 +674,11 @@ plot_ly(data.frame(), type = "parcoords", line = list(color = "blue"), height = 
   title = "Caractéristiques des différentes espèces d'oiseaux",
   margin = list(l = 140, r = 55)
 )
+```
+
+```{r}
+unique_nidi <- c("A", "B", "C", "A", "B", "A", "C")
+as.numeric(factor(unique(unique_nidi)))
+
+as.numeric(factor(unique_nidi))
 ```

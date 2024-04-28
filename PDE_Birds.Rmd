@@ -177,6 +177,81 @@ ggplot(index, aes(x = MOS11, y = D3, color = as.factor(annee))) +
 
 La tendance globale est l'augmentation de la diversité au début de la courbe jusqu'à atteindre un maximum puis une baisse quand le MOS11 augmente davantage. C'est-à-dire que, moins les sols sont artificialisés, plus la diversité est grande avec une diversité maximale atteinte quand le milieu est à la fois artificialisé mais présente également des surfaces non artificialisées. 
 
+On peut aussi essayer d'observer cette tendance de diversité par rapport à la distance de la maille avec le centre ville. Pour ce faire, nous allons calculer toutes les distances de chaque maille à PeyBerland, qui sera notre point référent pour le centre. 
+
+# Pey-PeyBerland
+
+```{r}
+PeyBerland <- data.frame("Latitude" = 44.838168, "Longitude" = -0.578803)
+
+# On convertit les coordonnées de PeyBerland en sf
+
+PeyBerland <- st_as_sf(PeyBerland, coords = c("Longitude", "Latitude"), crs = 4326)
+
+# On va créer un dataframe qui contient les coordonnées de toutes les stations code_maille
+
+coordinates <- st_as_sf(LUP, coords = c("X", "Y"), crs = 2154)
+
+# On va transformer les coordonnées de 2154 à 4326
+
+coordinates <- st_transform(coordinates, crs = 4326)
+
+# On va calculer les distances entre les stations et le centre ville PeyBerland
+
+coordinates$Distance <- st_distance(coordinates, PeyBerland)
+```
+
+On ajoute les distances à nos données de diversité. 
+
+```{r, message=FALSE}
+index$Distance <- rep(NA, nrow(index))
+for (i in 1:nrow(index)) {
+  index$Distance[i] <- coordinates$Distance[which(index$Code_Maille[i] == coordinates$ID & coordinates$BufferSize == 500)]
+}
+
+par(mfrow = c(1, 3))
+```
+
+
+```{r}
+ggplot(index, aes(x = Distance, y = D1, color = as.factor(annee))) +
+  geom_point(size = 2) +
+  geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
+  labs(title = "D1 en fonction de la distance au centre-ville",
+       x = "Distance",
+       y = "D1") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+```{r}
+ggplot(index, aes(x = Distance, y = D2, color = as.factor(annee))) +
+  geom_point(size = 2) +
+  geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
+  labs(title = "D2 en fonction de la distance au centre-ville",
+       x = "Distance",
+       y = "D2") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+```{r}
+ggplot(index, aes(x = Distance, y = D3, color = as.factor(annee))) +
+  geom_point(size = 2) +
+  geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
+  labs(title = "D3 en fonction de la distance au centre-ville",
+       x = "Distance",
+       y = "D3") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+La tendance globale est l'augmentation de la diversité au début de la courbe jusqu'à atteindre un maximum puis une baisse quand la distance avec le centre-ville augmente davantage. Nous pouvons voir que pour nos trois mesures de diversité, le pic est atteint à environ 9km. La diversité est donc plus grande lorsque la maille se trouver à environ 9km du centre-ville.
+Nous retrouvons donc la même observation qu'avec la variable d'artificialisation des sols (MOSS11), car l'artificialisation des sols et la distance avec le centre ville sont positivement corrélées (peut-etre essayer de mesurer la correlation entre ces deux variables sur nos données)
+
+
+Par la suite, l'objectif va être de comprendre pourquoi ce pic de diversité des espèces est observé à ce pourcentage d'artificialisation. Pour ce faire, nous allons introduire un nouveau jeu de données sur les caractéristiques des espèces d'oiseaux.
+Nous allons combiner ce jeu de données avec les autres jeux de données afin d'en tirer des analyses, principalement grâce à des cartes interactives. 
 
 
 ```{r}
@@ -270,7 +345,7 @@ denombrementCarte <- denombrementCarte %>%
 denombrementCarte
 
 ```
-Grâce à ce tableau, nous pouvons voir comment les données sont structurées et remarquer notamment qu'il classe le nombre d'oiseaux par maille et par année.
+Grâce à ce tableau, nous pouvons voir comment les données sont structurées et remarquer notamment qu'il classe le nombre d'oiseaux par maille et par année. (tableau peut-être trop grand pour le rendu)
 
 
 Voici la carte interactive qui montre les mailles de mesure et les oiseaux les plus observés dans chaque maille.
@@ -315,6 +390,11 @@ leaflet(data = denombrementCarte) %>%
 ```
 Grâce à cette carte, nous obtenons le classement (Top 3) des oiseaux les plus observés dans chaque maille de mesure pour l'année 2023.
 Nous avons également ajouté une information supplémentaire sur chaque oiseau pour mettre en évidence son niveau de spécialisation afin de mieux comprendre de quel type de milieu il a besoin pour vivre et la géolocalisation sur la Gironde.
+
+Nous pouvons voir que le niveau de spécialisation le plus répendu est généraliste car on en retrouve au centre-ville et en périphérie.
+Egalement, au centre ville, on retrouve des oiseaux de type Bâti et en périphérie loins du centre-ville, on retrouve des oiseaux de type Fôret et Agricole. Proche des points d'eau, on trouve des oiseaux de type Zone humide. 
+
+Ainsi, les zones qui combinent à la fois végétation et bâtiments seraient plus susceptibles d'accueillir des oiseaux avec des niveaux de spécialisation variés, ce qui expliquerait l'augmentation du taux de diversité observée dans les zones où se mélangent espaces verts et zones urbanisées.
 
 Il nous semblait intéressant de savoir quels étaient les régimes alimentaires majoritaires principaux en fonction de chaque maille.
 Nous avons donc créé un graphique qui montre la répartition des régimes alimentaires pour chaque maille.
@@ -424,7 +504,8 @@ leaflet(data = coordinates) %>%
   addPopupGraphs(p, width = 200, height = 200, group = "pnt")
 ```
 
-Voici à quoi ressemble la carte interactive qui montre les régimes alimentaires majoritaires principaux en fonction de chaque maille.
+Voici à quoi ressemble la carte interactive qui montre les régimes alimentaires majoritaires principaux en fonction de chaque maille. Nous pouvons voir qu'en général, le régime alimentaire dominant est le régime alimentaire mixte, que cela soit au centre de Bordeaux ou en périphérie. Il semble donc que le régime alimentaire de l'oiseau ne soit pas véritablement impacté par l'artificialisation des sols.
+Essayons maintenant d'étudier d'autre caratéristiques afin d'essayer de trouver des raisons à ce pic de diversité.
 
 
 ```{r}
@@ -481,96 +562,11 @@ leaflet(data = coordinates) %>%
   addPopupGraphs(p, width = 200, height = 200, group = "pnt")
 ```
 
-# Pey-PeyBerland
+Cette carte illustre la répartition des types de nidification en fonction des zones géographiques. Il est observé que dans les zones centrales, la majorité des nids sont situés dans des cavités, ce qui peut être attribué à la densité élevée de bâtiments et à la rareté de la végétation en ville. Le mode de nidification au sol est le moins courant dans ces zones, probablement en raison de la faible probabilité de survie des oiseaux dans un environnement urbain avec un nid au sol.  
 
-```{r}
-# Maintenant on va faire un datframe qui calcule les distances de toues les stations code_maille avec le centre ville, en considérant que le centre ville est PeyBerland
+En périphérie, les modes de nidification semblent plus diversifiés, avec une prédominance de la nidification en buisson. La nidification dans les arbres est également très répandue, et on retrouve aussi la nidification en cavité. Le fait de ne pas être situé directement au centre-ville semble offrir plus de possibilités de nidification, ce qui pourrait expliquer une plus grande diversité d'espèces si on s'éloigne légèrement du centre ville, grâce à une combinaison de bâtiments et de végétation offrant plus de choix pour la nidification.
 
-# On donne la cordonnée de PeyBerland (latitude et longitude) afin de calculer les distances par la suite avec sf
-# lat = 44.838168 et long = -0.578803
 
-PeyBerland <- data.frame("Latitude" = 44.838168, "Longitude" = -0.578803)
-
-# On convertit les coordonnées de PeyBerland en sf
-
-PeyBerland <- st_as_sf(PeyBerland, coords = c("Longitude", "Latitude"), crs = 4326)
-
-# On va créer un dataframe qui contient les coordonnées de toutes les stations code_maille
-
-coordinates <- st_as_sf(LUP, coords = c("X", "Y"), crs = 2154)
-
-# On va transformer les coordonnées de 2154 à 4326
-
-coordinates <- st_transform(coordinates, crs = 4326)
-
-# On va calculer les distances entre les stations et le centre ville PeyBerland
-
-coordinates$Distance <- st_distance(coordinates, PeyBerland)
-```
-
-```{r, message=FALSE}
-denombrement <- oiseaux %>%
-  group_by(Code_Maille, annee, latin) %>%
-  summarise(sum = sum(Denombrement_min, na.rm = TRUE), .groups = "drop") %>%
-  arrange(desc(Code_Maille))
-
-denombrement$p <- rep(NA, nrow(denombrement))
-for (i in 1:nrow(denombrement)) {
-  numerator <- denombrement$sum[i]
-  denominator <-
-    sum(denombrement$sum[which(denombrement$Code_Maille == denombrement$Code_Maille[i]
-                               & denombrement$annee == denombrement$annee[i])])
-  denombrement$p[i] <- numerator / denominator
-}
-
-index <- denombrement %>%
-  group_by(Code_Maille, annee = factor(annee)) %>%
-  summarise(D1 = sum(p > 0, na.rm = TRUE),
-            D2 = exp(-sum(p * log(p))),
-            D3 = 1 / sum(p^2), .groups = "drop") %>%
-  arrange(desc(Code_Maille))
-
-LUP <- read.csv("data/birds/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
-index$Distance <- rep(NA, nrow(index))
-for (i in 1:nrow(index)) {
-  index$Distance[i] <- coordinates$Distance[which(index$Code_Maille[i] == coordinates$ID & coordinates$BufferSize == 500)]
-}
-
-par(mfrow = c(1, 3))
-```
-
-```{r}
-ggplot(index, aes(x = Distance, y = D1, color = as.factor(annee))) +
-  geom_point(size = 2) +
-  geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
-  labs(title = "D1 en fonction de la distance au centre-ville",
-       x = "Distance",
-       y = "D1") +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-```
-
-```{r}
-ggplot(index, aes(x = Distance, y = D2, color = as.factor(annee))) +
-  geom_point(size = 2) +
-  geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
-  labs(title = "D2 en fonction de la distance au centre-ville",
-       x = "Distance",
-       y = "D2") +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-```
-
-```{r}
-ggplot(index, aes(x = Distance, y = D3, color = as.factor(annee))) +
-  geom_point(size = 2) +
-  geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
-  labs(title = "D3 en fonction de la distance au centre-ville",
-       x = "Distance",
-       y = "D3") +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-```
 
 
 # ACP

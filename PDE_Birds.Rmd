@@ -423,8 +423,8 @@ leaflet(data = coordinates) %>%
 
 Voici à quoi ressemble la carte interactive qui montre les régimes alimentaires majoritaires principaux en fonction de chaque maille.
 
-<!--
-  ```{r}
+
+  <!-- ```{r}
   denombrement$Nidification <- rep(NA, nrow(denombrement))
   for (i in 1:nrow(denombrement)) {
     if (denombrement$latin[i] %in% no_info) {
@@ -475,8 +475,8 @@ Voici à quoi ressemble la carte interactive qui montre les régimes alimentaire
     addLegend("bottomright", pal = pal, values = coordinates$MOS11, title = "MOS11") %>%
     addScaleBar(position = "bottomleft") %>%
     addPopupGraphs(p, width = 200, height = 200, group = "pnt")
-  ```
--->
+  ``` -->
+
 
 # Pey-PeyBerland
 

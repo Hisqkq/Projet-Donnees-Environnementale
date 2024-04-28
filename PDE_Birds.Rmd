@@ -677,8 +677,84 @@ plot_ly(data.frame(), type = "parcoords", line = list(color = "blue"), height = 
 ```
 
 ```{r}
-unique_nidi <- c("A", "B", "C", "A", "B", "A", "C")
-as.numeric(factor(unique(unique_nidi)))
+LUP <- read.csv("data/birds/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
+LUP <- LUP[, c(c("ID", "BufferSize"), paste0("MOS", 1:14))]
 
-as.numeric(factor(unique_nidi))
+birds_obs <- read.csv("data/birds/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
+birds_obs <- birds_obs[, c(c("Code_Maille", "Date", "Nom_Taxon_Cite", "Denombrement_min"))]
+birds_obs <- birds_obs %>%
+  rename(Year = Date, ID = Code_Maille, Latin = Nom_Taxon_Cite)
+
+birds_obs[, "Year"] <- substr(birds_obs[, "Year"], start = 1, stop = 4)
+birds_obs[, "Latin"] <- sapply(strsplit(birds_obs[, "Latin"], split = " | ", fixed = TRUE), function(x) x[1])
+
+birds_obs <- birds_obs %>%
+  group_by(ID, Year, Latin) %>%
+  summarise(Sum = sum(Denombrement_min), .groups = "drop")
+
+LUP_birds_obs <- merge(LUP, birds_obs, by = "ID")
+```
+
+```{r}
+unique_year <- unique(LUP_birds_obs[, "Year"])
+unique_year <- unique_year[order(unique_year)]
+
+ids <- c("Année", unique_year)
+for (year in unique_year) {
+  ids <- c(ids, paste0(year, paste0(" - MOS", 1:14)))
+}
+
+for (year in unique_year) {
+  for (mos in paste0("MOS", 1:14)) {
+    for (specie in birds_info[, "Nom.latin"]) {
+      ids <- c(ids, paste0(year, paste0(paste0(" - ", mos), paste0(" - ", specie))))
+    }
+  }
+}
+
+labels <- c("Année", unique_year, rep(paste0("MOS", 1:14), times = length(unique_year)))
+labels <- c(labels, rep(birds_info[, "Nom.latin"], times = 14 * length(unique_year)))
+
+parents <- c("", rep("Année", times = length(unique_year)), rep(unique_year, each = 14))
+for (year in unique_year) {
+  parents <- c(parents, paste0(year, rep(paste0(" - MOS", 1:14), each = length(birds_info[, "Nom.latin"]))))
+}
+
+values <- c(c(length(unique_year) * 14000, rep(14000, times = length(unique_year))), rep(1000, times = length(unique_year) * 14))
+for (year in unique_year) {
+  for (mos in paste0("MOS", 1:14)) {
+    for (specie in birds_info[, "Nom.latin"]) {
+      tmp <- LUP_birds_obs[LUP_birds_obs["Year"] == year & LUP_birds_obs["Latin"] == specie & LUP_birds_obs["BufferSize"] == 500, ]
+      values <- c(values, sum(tmp[mos] * tmp["Sum"]))
+    }
+    tail_values <- values[(1 + length(values) - length(birds_info[, "Nom.latin"])):length(values)]
+    values[(1 + length(values) - length(birds_info[, "Nom.latin"])):length(values)] <- tail_values / sum(tail_values) * 1000
+  }
+}
+
+is_nan_values <- !is.na(values) & values != 0
+ids <- ids[is_nan_values]
+labels <- labels[is_nan_values]
+parents <- parents[is_nan_values]
+values <- values[is_nan_values]
+```
+
+```{r}
+plot_ly(
+  ids = ids,
+  labels = labels,
+  parents = parents,
+  values = values,
+  type = "sunburst",
+  branchvalues = "total",
+  maxdepth = 2,
+  insidetextorientation = "radial",
+  hoverinfo = "label+percent entry"
+) %>% layout(
+  title = list(
+    text = "Proportion des espèces d'oiseaux les plus couramment observées<br>en fonction de l'année et du MOS",
+    y = 1.1
+  ),
+  margin = list(t = 100)
+)
 ```

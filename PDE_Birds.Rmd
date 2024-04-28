@@ -26,10 +26,6 @@ output:
   }
 </style>
 
-```{r config, include=FALSE}
-knitr::opts_chunk$set(out.width = "100%")
-```
-
 ```{r setup, message=FALSE, echo=FALSE}
 # Packages de gestion des données
 library(tidyverse)
@@ -40,6 +36,7 @@ library(ggplot2)
 library(ggspatial)
 library(kableExtra)
 library(lattice)
+library(plotly)
 
 # Packages pour visualisation de cartes intéractives
 library(leaflet)
@@ -49,6 +46,9 @@ library(leaflet.extras)
 #ACP
 library(FactoMineR)
 library(factoextra)
+
+knitr::opts_chunk$set(out.width = "100%")
+knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
@@ -418,59 +418,61 @@ leaflet(data = coordinates) %>%
   addPopupGraphs(p, width = 200, height = 200, group = "pnt")
 ```
 
-```{r}
-denombrement$Nidification <- rep(NA, nrow(denombrement))
-for (i in 1:nrow(denombrement)) {
-  if (denombrement$latin[i] %in% no_info) {
-    denombrement$Nidification[i] <- NA
-  } else {
-    denombrement$Nidification[i] <-
-      alimentation$Nidification[which(alimentation$Nom.latin == denombrement$latin[i])]
+<!--
+  ```{r}
+  denombrement$Nidification <- rep(NA, nrow(denombrement))
+  for (i in 1:nrow(denombrement)) {
+    if (denombrement$latin[i] %in% no_info) {
+      denombrement$Nidification[i] <- NA
+    } else {
+      denombrement$Nidification[i] <-
+        alimentation$Nidification[which(alimentation$Nom.latin == denombrement$latin[i])]
+    }
   }
-}
-denombrement$Nidification <- as.factor(denombrement$Nidification)
+  denombrement$Nidification <- as.factor(denombrement$Nidification)
 
-plot_data <- function(data, title) {
-  ggplot(data, aes(x = "", y = sum, fill = Nidification)) +
-    geom_bar(stat = "identity", width = 0.1) +
-    coord_polar("y", start = 0) +
-    ggtitle(paste("Station: ", as.character(title))) +
-    theme_void()
-}
-
-#On join les deux tables cite et denombrementCarte
-
-N <- length(unique(denombrement$Code_Maille))
-p <- vector("list", length = N)
-
-for (i in 1:N) {
-  data <- denombrement[which(denombrement$Code_Maille == unique(denombrement$Code_Maille)[i]), ]
-  data <- data %>% group_by(Nidification) %>% summarise(sum = sum(p, na.rm = TRUE))
-  p[[i]] <- plot_data(data, unique(denombrement$Nom_lieu)[i])
-}
-
-coordinates <- st_as_sf(LUP, coords = c("X", "Y"), crs = 2154)
-coordinates <- st_transform(coordinates, crs = 4326)
-coordinates <- coordinates[coordinates$BufferSize == 500, ]
-
-# Remove the coordinates that are not in denombrement
-for (i in seq_along(coordinates$ID)){
-  if (!(coordinates$ID[i] %in% unique(denombrement$Code_Maille))) {
-    coordinates <- coordinates[-i, ]
+  plot_data <- function(data, title) {
+    ggplot(data, aes(x = "", y = sum, fill = Nidification)) +
+      geom_bar(stat = "identity", width = 0.1) +
+      coord_polar("y", start = 0) +
+      ggtitle(paste("Station: ", as.character(title))) +
+      theme_void()
   }
-}
 
-coordinates <- coordinates[order(coordinates$ID, decreasing = TRUE), ]
+  #On join les deux tables cite et denombrementCarte
 
-pal <- colorNumeric("viridis", domain = coordinates$MOS11)
-leaflet(data = coordinates) %>%
-  addProviderTiles("CartoDB.Positron") %>%
-  addCircles(radius = 300, color = ~pal(MOS11),
-             fillOpacity = 0.5, group = "pnt") %>%
-  addLegend("bottomright", pal = pal, values = coordinates$MOS11, title = "MOS11") %>%
-  addScaleBar(position = "bottomleft") %>%
-  addPopupGraphs(p, width = 200, height = 200, group = "pnt")
-```
+  N <- length(unique(denombrement$Code_Maille))
+  p <- vector("list", length = N)
+
+  for (i in 1:N) {
+    data <- denombrement[which(denombrement$Code_Maille == unique(denombrement$Code_Maille)[i]), ]
+    data <- data %>% group_by(Nidification) %>% summarise(sum = sum(p, na.rm = TRUE))
+    p[[i]] <- plot_data(data, unique(denombrement$Nom_lieu)[i])
+  }
+
+  coordinates <- st_as_sf(LUP, coords = c("X", "Y"), crs = 2154)
+  coordinates <- st_transform(coordinates, crs = 4326)
+  coordinates <- coordinates[coordinates$BufferSize == 500, ]
+
+  # Remove the coordinates that are not in denombrement
+  for (i in seq_along(coordinates$ID)){
+    if (!(coordinates$ID[i] %in% unique(denombrement$Code_Maille))) {
+      coordinates <- coordinates[-i, ]
+    }
+  }
+
+  coordinates <- coordinates[order(coordinates$ID, decreasing = TRUE), ]
+
+  pal <- colorNumeric("viridis", domain = coordinates$MOS11)
+  leaflet(data = coordinates) %>%
+    addProviderTiles("CartoDB.Positron") %>%
+    addCircles(radius = 300, color = ~pal(MOS11),
+              fillOpacity = 0.5, group = "pnt") %>%
+    addLegend("bottomright", pal = pal, values = coordinates$MOS11, title = "MOS11") %>%
+    addScaleBar(position = "bottomleft") %>%
+    addPopupGraphs(p, width = 200, height = 200, group = "pnt")
+  ```
+-->
 
 ```{r}
 # Maintenant on va faire un datframe qui calcule les distances de toues les stations code_maille avec le centre ville, en considérant que le centre ville est PeyBerland
@@ -581,5 +583,78 @@ fviz_pca_biplot(
   pca_result,
   repel = FALSE,
   col.var = "#E50000"
+)
+```
+
+```{r}
+birds_info <- read.csv("data/birds/traits-statut-IUCN-biodivercite.csv", header = TRUE)
+birds_info <- birds_info[, c(
+  "Nom.latin",
+  "Niveau.de.spécialisation",
+  "Régime.alimentaire",
+  "Technique.d.alimentation",
+  "Nidification",
+  "Période.de.migration"
+)]
+
+denombrement
+LUP
+```
+
+```{r}
+unique_level <- unique(birds_info[, "Niveau.de.spécialisation"])
+unique_regime <- unique(birds_info[, "Régime.alimentaire"])
+unique_technique <- unique(birds_info[, "Technique.d.alimentation"])
+unique_nidi <- unique(birds_info[, "Nidification"])
+unique_migration <- unique(birds_info[, "Période.de.migration"])
+
+plot_ly(data.frame(), type = "parcoords", line = list(color = "blue"), height = 950,
+  dimensions = list(
+    list(
+      label = "Espèces",
+      range = c(1, length(birds_info[, "Nom.latin"])),
+      tickvals = 1:length(birds_info[, "Nom.latin"]),
+      ticktext = birds_info[, "Nom.latin"],
+      values = 1:length(birds_info[, "Nom.latin"])
+    ),
+    list(
+      label = "Technique d'alimentation",
+      range = c(1, length(unique_technique)),
+      tickvals = 1:length(unique_technique),
+      ticktext = unique_technique,
+      values = as.numeric(factor(birds_info[, "Technique.d.alimentation"]))
+    ),
+    list(
+      label = "Nidification",
+      range = c(1, length(unique_nidi)),
+      tickvals = 1:length(unique_nidi),
+      ticktext = unique_nidi,
+      values = as.numeric(factor(birds_info[, "Nidification"]))
+    ),
+    list(
+      label = "Niveau de spécialisation",
+      range = c(1, length(unique_level)),
+      tickvals = 1:length(unique_level),
+      ticktext = unique_level,
+      values = as.numeric(factor(birds_info[, "Niveau.de.spécialisation"]))
+    ),
+    list(
+      label = "Période de migration",
+      range = c(1, length(unique_migration)),
+      tickvals = 1:length(unique_migration),
+      ticktext = unique_migration,
+      values = as.numeric(factor(birds_info[, "Période.de.migration"]))
+    ),
+    list(
+      label = "Régime alimentaire",
+      range = c(1, length(unique_regime)),
+      tickvals = 1:length(unique_regime),
+      ticktext = unique_regime,
+      values = as.numeric(factor(birds_info[, "Régime.alimentaire"]))
+    )
+  )
+) %>% layout(
+  title = "Caractéristiques des différentes espèces d'oiseaux",
+  margin = list(l = 140, r = 55)
 )
 ```

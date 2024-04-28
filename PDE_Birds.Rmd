@@ -29,7 +29,7 @@ output:
 # Introduction
 
 
-Dans le cadre de notre projet de statistiques, nous avons décidé de travailler sur un jeu de données environnementales.
+Dans le cadre de notre projet de statistiques, nous devons travailler sur un jeu de données environnementales.
 Ce jeu de données est composé de plusieurs fichiers qui contiennent des informations sur les oiseaux, les stations de mesure, les traits des oiseaux, les sites de mesure, les régimes alimentaires des oiseaux, les statuts de l'IUCN et la biodiversité.
 Nous avons décidé de nous concentrer sur les oiseaux et les stations de mesure.
 Nous avons donc nettoyé les données, effectué des analyses exploratoires et des analyses multivariées pour mieux comprendre les relations entre les différentes variables.
@@ -100,13 +100,12 @@ as.data.frame.matrix(table(oiseaux$latin, oiseaux$Annee))
 ```
 
 
-Dans cette partie, nous allons explorer la mesure de la diversité à travers différentes entropies.
-Nous nous intéresserons uniquement au MOS11, c'est à dire les surfaces artificialisées.
+Dans cette partie, nous allons explorer la mesure de la diversité à travers différentes mesures.
+Nous nous intéresserons uniquement au MOS11, c'est à dire les surfaces artificialisées. On prend comme buffer size 500m.
 
-Dans un premier temps, nous allons utiliser le nombre d’espèces différentes observées dans une station pour mesurer la diversité.
-Dans un deuxième temps, nous allons utiliser l’entropie de Shannon et enfin l'indice de Simpson.
+Dans un premier temps, nous allons utiliser la proportion d’espèces différentes observées dans une station pour mesurer la diversité. Dans un deuxième temps, nous allons utiliser l’entropie de Shannon et enfin l'indice de Simpson.
 
-```{r, message=FALSE}
+```{r, message=FALSE, warning=FALSE}
 ## Analyse de diversité par rapport à MOS11 et par année
 
 denombrement <- oiseaux %>%
@@ -135,24 +134,23 @@ index$MOS11 <- rep(NA, nrow(index))
 for (i in 1:nrow(index)) {
   index$MOS11[i] <- LUP$MOS11[which(index$Code_Maille[i] == LUP$ID & LUP$BufferSize == 500)]
 }
-
-par(mfrow = c(1, 3))
 ```
 
-Voici le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliqué par le nombre d'espèces.
-```{r}
+Voici le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliqué par la proportion d'espèces.
+```{r, message=FALSE, warning=FALSE, error=FALSE}
 ggplot(index, aes(x = MOS11, y = D1, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
-  labs(title = " 'Nombre d\'espèces' en fonction de MOS11",
+  labs(title = " Proportion d’espèces en fonction de MOS11",
        x = "MOS11",
        y = "Nombre d\'espèces") +
   theme_minimal() +
+  labs(colour = "Année") +
   theme(legend.position = "bottom")
 ```
 
 Ceci est le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliqué par l'entropie de Shannon.
-```{r}
+```{r, message=FALSE, warning=FALSE, error=FALSE}
 ggplot(index, aes(x = MOS11, y = D2, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
@@ -160,11 +158,12 @@ ggplot(index, aes(x = MOS11, y = D2, color = as.factor(annee))) +
        x = "MOS11",
        y = "Indice de Shanon") +
   theme_minimal() +
+  labs(colour = "Année") +
   theme(legend.position = "bottom")
 ```
 
 Ceci est le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliqué par l'indice de Simpson.
-```{r}
+```{r, message=FALSE, warning=FALSE, error=FALSE}
 ggplot(index, aes(x = MOS11, y = D3, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
@@ -172,13 +171,11 @@ ggplot(index, aes(x = MOS11, y = D3, color = as.factor(annee))) +
        x = "MOS11",
        y = "Indice de Simpson") +
   theme_minimal() +
+  labs(colour = "Année") +
   theme(legend.position = "bottom")
 ```
 
-La tendance globale est l'augmentation de la diversité au début de la courbe. C'est à dire que, moins les sols sont 
-artificialisés, plus la diversité est grande. 
-En effet, puisqu'on peut remarquer que plus l'artificialisation est forte, moins la diversité est grande.
-
+La tendance globale est l'augmentation de la diversité au début de la courbe jusqu'à atteindre un maximum puis une baisse quand le MOS11 augmente davantage. C'est-à-dire que, moins les sols sont artificialisés, plus la diversité est grande avec une diversité maximale atteinte quand le milieu est à la fois artificialisé mais présente également des surfaces non artificialisées. 
 
 
 
@@ -203,7 +200,6 @@ my_split <- function(array, str = " \\| ") {
 
 # Tester la fonction
 only_latin <- my_split(as.vector(oiseaux$Nom_Taxon_Cite))
-length(unique(only_latin)) == length(unique(oiseaux$Code_Ref))
 
 # On ajoute la nouvelle colonne au dataframe
 oiseaux$latin <- only_latin
@@ -320,6 +316,8 @@ leaflet(data = denombrementCarte) %>%
 Grâce à cette carte, nous obtenons le classement (Top 3) des oiseaux les plus observés dans chaque maille de mesure pour l'année 2023.
 Nous avons également ajouté une information supplémentaire sur chaque oiseau pour mettre en évidence son niveau de spécialisation afin de mieux comprendre de quel type de milieu il a besoin pour vivre et la géolocalisation sur la Gironde.
 
+Il nous semblait intéressant de savoir quels étaient les régimes alimentaires majoritaires principaux en fonction de chaque maille.
+Nous avons donc créé un graphique qui montre la répartition des régimes alimentaires pour chaque maille.
 
 ```{r}
 oiseaux <- read.csv("data/birds/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
@@ -362,42 +360,8 @@ index$MOS11 <- rep(NA, nrow(index))
 for (i in 1:nrow(index)) {
   index$MOS11[i] <- LUP$MOS11[which(index$Code_Maille[i] == LUP$ID & LUP$BufferSize == 500)]
 }
-
-par(mfrow = c(1, 3))
 ```
 
-```{r}
-ggplot(index, aes(x = MOS11, y = D1, color = annee)) +
-  geom_point(size = 2) +
-  labs(title = "D1 en fonction de MOS11",
-       x = "MOS11",
-       y = "D1") +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-```
-
-```{r}
-ggplot(index, aes(x = MOS11, y = D2, color = annee)) +
-  geom_point(size = 2) +
-  labs(title = "D1 en fonction de MOS11",
-       x = "MOS11",
-       y = "D1") +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-```
-
-```{r}
-ggplot(index, aes(x = MOS11, y = D3, color = annee)) +
-  geom_point(size = 2) +
-  labs(title = "D1 en fonction de MOS11",
-       x = "MOS11",
-       y = "D1") +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-```
-
-
-Il nous semblait intéressant de savoir quels étaient les régimes alimentaires majoritaires principaux en fonction de chaque maille.
 ```{r}
 # changed the unmatchinng latin names to the correct ones to match alimentation
 denombrement$latin[denombrement$latin == "Carduelis chloris"] <- "Chloris chloris"

@@ -1,6 +1,6 @@
 ---
 title: "Projet stat pour données environnementales"
-author: "Louis Delignac, Baptiste Gerbouin, Théo Lavandier, Alexandre Leys, Hamad Tria"
+author: "Alexandre Leys, Baptiste Gerbouin, Hamad Tria, Louis Delignac, Théo Lavandier"
 date: "`r format(Sys.Date(), '%d %B, %Y')`"
 output:
   html_document:
@@ -26,6 +26,15 @@ output:
   }
 </style>
 
+# Introduction
+
+
+Dans le cadre de notre projet de statistiques, nous devons travailler sur un jeu de données environnementales.
+Ce jeu de données est composé de plusieurs fichiers qui contiennent des informations sur les oiseaux, les stations de mesure, les traits des oiseaux, les sites de mesure, les régimes alimentaires des oiseaux, les statuts de l'IUCN et la biodiversité.
+Nous avons décidé de nous concentrer sur les oiseaux et les stations de mesure.
+Nous avons donc nettoyé les données, effectué des analyses exploratoires et des analyses multivariées pour mieux comprendre les relations entre les différentes variables.
+Nous avons également créé des cartes interactives pour visualiser les données.
+
 ```{r setup, message=FALSE, echo=FALSE}
 # Packages de gestion des données
 library(tidyverse)
@@ -47,13 +56,14 @@ library(leaflet.extras)
 library(FactoMineR)
 library(factoextra)
 
-knitr::opts_chunk$set(out.width = "100%")
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(out.width = "100%", echo = TRUE)
 ```
 
+Pour commencer, nous allons charger les données et les explorer pour mieux comprendre leur structure.
+Dans un premier temps, nous allons ajouter une colonne à notre DataFrame qui contient les noms latins des oiseaux.
 ```{r}
 oiseaux <- read.csv("data/birds/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
-# CREATE A NEW COLUMN IN THE OISEAUX DATAFRAME THAT CONTAINS THE LATIN NAME OF THE BIRD
+# CRÉER UNE NOUVELLE COLONNE DANS LE DATAFRAME OISEAUX QUI CONTIENT LE NOM LATIN DE L'OISEAU
 my_split <- function(array, str = " \\| ") {
   out <- rep(NA, length(array))
   for (i in 1:length(array)) {
@@ -63,30 +73,36 @@ my_split <- function(array, str = " \\| ") {
 }
 
 only_latin <- my_split(as.vector(oiseaux$Nom_Taxon_Cite))
-# length(unique(only_latin)) == length(unique(oiseaux$Code_Ref))
 
 oiseaux$latin <- only_latin
 oiseaux$annee <- as.numeric(substr(oiseaux$Date, 1, 4))
 ```
 
 
-
+Par la suite, nous allons explorer les données pour mieux comprendre la distribution des espèces d'oiseaux observées.
+Voici un tableau qui montre les 10 espèces d'oiseaux les plus fréquemment observées dans l'ensemble des données.
 ```{r}
-# THE MOST FREQUENT BIRD SPECIES OBSERVED IN THE DATASET
+# LES ESPÈCES D'OISEAUX LES PLUS FRÉQUENTES OBSERVÉES DANS L'ENSEMBLE DES DONNÉES
 as.data.frame(sort(table(oiseaux$latin), decreasing = TRUE)[1:10])
 ```
 
+Nous allons maintenant explorer la fréquence des espèces d'oiseaux observées dans l'ensemble des données par année.
+Voici, par ordre alphabétique, le tableau mettant en évidence cette fréquence.
+
 ```{r}
-# FREQUENCY OF BIRD SPECIES OBSERVED IN THE DATASET BY YEAR
+# FRÉQUENCE DES ESPÈCES D'OISEAUX OBSERVÉES DANS L'ENSEMBLE DES DONNÉES PAR ANNÉE
 Annee <- my_split(as.vector(oiseaux$Date), str = "-")
 oiseaux$Annee <- as.factor(Annee)
 as.data.frame.matrix(table(oiseaux$latin, oiseaux$Annee))
 ```
 
 
+Dans cette partie, nous allons explorer la mesure de la diversité à travers différentes mesures.
+Nous nous intéresserons uniquement au MOS11, c'est à dire les surfaces artificialisées. On prend comme buffer size 500m.
 
+Dans un premier temps, nous allons utiliser la proportion d’espèces différentes observées dans une station pour mesurer la diversité. Dans un deuxième temps, nous allons utiliser l’entropie de Shannon et enfin l'indice de Simpson.
 
-```{r, message=FALSE}
+```{r, message=FALSE, warning=FALSE}
 ## Analyse de diversité par rapport à MOS11 et par année
 
 denombrement <- oiseaux %>%
@@ -115,36 +131,48 @@ index$MOS11 <- rep(NA, nrow(index))
 for (i in 1:nrow(index)) {
   index$MOS11[i] <- LUP$MOS11[which(index$Code_Maille[i] == LUP$ID & LUP$BufferSize == 500)]
 }
+```
 
-par(mfrow = c(1, 3))
+Voici le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliqué par la proportion d'espèces.
+```{r, message=FALSE, warning=FALSE, error=FALSE}
 ggplot(index, aes(x = MOS11, y = D1, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
-  labs(title = "D1 en fonction de MOS11",
+  labs(title = " Proportion d’espèces en fonction de MOS11",
        x = "MOS11",
-       y = "D1") +
+       y = "Nombre d\'espèces") +
   theme_minimal() +
-  theme(legend.position = "bottom")
-
-ggplot(index, aes(x = MOS11, y = D2, color = as.factor(annee))) +
-  geom_point(size = 2) +
-  geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
-  labs(title = "D2 en fonction de MOS11",
-       x = "MOS11",
-       y = "D2") +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-
-ggplot(index, aes(x = MOS11, y = D3, color = as.factor(annee))) +
-  geom_point(size = 2) +
-  geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
-  labs(title = "D3 en fonction de MOS11",
-       x = "MOS11",
-       y = "D3") +
-  theme_minimal() +
+  labs(colour = "Année") +
   theme(legend.position = "bottom")
 ```
 
+Ceci est le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliqué par l'entropie de Shannon.
+```{r, message=FALSE, warning=FALSE, error=FALSE}
+ggplot(index, aes(x = MOS11, y = D2, color = as.factor(annee))) +
+  geom_point(size = 2) +
+  geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
+  labs(title = "Indice de Shanon en fonction de MOS11",
+       x = "MOS11",
+       y = "Indice de Shanon") +
+  theme_minimal() +
+  labs(colour = "Année") +
+  theme(legend.position = "bottom")
+```
+
+Ceci est le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliqué par l'indice de Simpson.
+```{r, message=FALSE, warning=FALSE, error=FALSE}
+ggplot(index, aes(x = MOS11, y = D3, color = as.factor(annee))) +
+  geom_point(size = 2) +
+  geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
+  labs(title = "Indice de Simpson en fonction de MOS11",
+       x = "MOS11",
+       y = "Indice de Simpson") +
+  theme_minimal() +
+  labs(colour = "Année") +
+  theme(legend.position = "bottom")
+```
+
+La tendance globale est l'augmentation de la diversité au début de la courbe jusqu'à atteindre un maximum puis une baisse quand le MOS11 augmente davantage. C'est-à-dire que, moins les sols sont artificialisés, plus la diversité est grande avec une diversité maximale atteinte quand le milieu est à la fois artificialisé mais présente également des surfaces non artificialisées. 
 
 
 
@@ -154,11 +182,11 @@ LUP <- read.csv("data/birds/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
 ```
 
 ```{r}
-# CREATE A NEW COLUMN IN THE OISEAUX DATAFRAME THAT CONTAINS THE LATIN NAME OF THE BIRD
-# THE LATIN NAME IS THE FIRST NAME IN THE "Nom_Taxon_Cite" COLUMN
-# IF THE NAME CONTAINS A "|", THE LATIN NAME IS THE FIRST NAME BEFORE THE "|"
+# CRÉER UNE NOUVELLE COLONNE DANS LE DATAFRAME OISEAUX QUI CONTIENT LE NOM LATIN DE L'OISEAU
+# LE NOM LATIN EST LE PREMIER NOM DE LA COLONNE "Nom_Taxon_Cite
+# SI LE NOM CONTIENT UN "|", LE NOM LATIN EST LE PREMIER NOM AVANT LE "|"
 
-# Split the names
+# Diviser les noms
 my_split <- function(array, str = " \\| ") {
   out <- rep(NA, length(array))
   for (i in 1:length(array)) {
@@ -167,16 +195,16 @@ my_split <- function(array, str = " \\| ") {
   return(out)
 }
 
-# Test the function
+# Tester la fonction
 only_latin <- my_split(as.vector(oiseaux$Nom_Taxon_Cite))
-length(unique(only_latin)) == length(unique(oiseaux$Code_Ref))
 
-# Add the new column to the dataframe
+# On ajoute la nouvelle colonne au dataframe
 oiseaux$latin <- only_latin
 ```
 
+On affiche le tableau qui représente le MOS11 pour chaque station de mesure.
 ```{r}
-# CREATE A NEW COLUMN IN THE OISEAUX DATAFRAME THAT CONTAINS THE MOS11 VALUE OF THE POINT
+# CRÉER UNE NOUVELLE COLONNE DANS LE DATAFRAME OISEAUX QUI CONTIENT LA VALEUR MOS11 DU POINT
 filter <- LUP$BufferSize == 500
 LUP_500_MOS11 <- LUP[filter, c("Geometry", "ID", "X", "Y", "BufferSize", "MOS11")]
 rownames(LUP_500_MOS11) <- 1:nrow(LUP_500_MOS11)
@@ -187,11 +215,12 @@ for (i in 1:nrow(oiseaux)) {
   MOS11[i] <- which(oiseaux$Code_Maille[i] == LUP_500_MOS11$ID)
 }
 
-# Add the new column to the dataframe
+# Ajouter la colonne MOS11 au dataframe
 oiseaux$MOS11 <- LUP_500_MOS11$MOS11[MOS11]
 ```
 
-## On fait la maaaaaaaaaaaaaap
+
+# On fait la carte
 
 
 ```{r}
@@ -238,13 +267,12 @@ denombrementCarte <- denombrementCarte %>%
 denombrementCarte
 
 ```
+Grâce à ce tableau, nous pouvons voir comment les données sont structurées et remarquer notamment qu'il classe le nombre d'oiseaux par maille et par année.
 
 
-
+Voici la carte interactive qui montre les mailles de mesure et les oiseaux les plus observés dans chaque maille.
 ```{r}
 # On garder que les colonnes qui nous intéressent, cad code_site et Nom_lieu
-
-
 cite <- cite %>%
   select(code_site, Nom_lieu)
 
@@ -258,7 +286,6 @@ denombrementCarte$popup_text <- paste0("<strong>Maille:</strong> ", denombrement
                                        "<strong>Top 3 des oiseaux:</strong>", "<br>")
 
 dataframe <- as.data.frame(denombrementCarte)
-dataframe
 
 # On enleve les colonnes Code_Maille, annee, BufferSize, MOS11, Geometry, geometry
 dataframe <- dataframe %>%
@@ -283,12 +310,14 @@ leaflet(data = denombrementCarte) %>%
   addLegend("bottomright", pal = pal, values = ~MOS11, title = "MOS11", position = "bottomright") %>%
   addScaleBar(position = "bottomleft")
 ```
+Grâce à cette carte, nous obtenons le classement (Top 3) des oiseaux les plus observés dans chaque maille de mesure pour l'année 2023.
+Nous avons également ajouté une information supplémentaire sur chaque oiseau pour mettre en évidence son niveau de spécialisation afin de mieux comprendre de quel type de milieu il a besoin pour vivre et la géolocalisation sur la Gironde.
 
-
+Il nous semblait intéressant de savoir quels étaient les régimes alimentaires majoritaires principaux en fonction de chaque maille.
+Nous avons donc créé un graphique qui montre la répartition des régimes alimentaires pour chaque maille.
 
 ```{r}
 oiseaux <- read.csv("data/birds/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
-# CREATE A NEW COLUMN IN THE OISEAUX DATAFRAME THAT CONTAINS THE LATIN NAME OF THE BIRD
 my_split <- function(array, str = " \\| ") {
   out <- rep(NA, length(array))
   for (i in 1:length(array)) {
@@ -298,7 +327,6 @@ my_split <- function(array, str = " \\| ") {
 }
 
 only_latin <- my_split(as.vector(oiseaux$Nom_Taxon_Cite))
-# length(unique(only_latin)) == length(unique(oiseaux$Code_Ref))
 
 oiseaux$latin <- only_latin
 oiseaux$annee <- as.numeric(substr(oiseaux$Date, 1, 4))
@@ -329,31 +357,6 @@ index$MOS11 <- rep(NA, nrow(index))
 for (i in 1:nrow(index)) {
   index$MOS11[i] <- LUP$MOS11[which(index$Code_Maille[i] == LUP$ID & LUP$BufferSize == 500)]
 }
-
-par(mfrow = c(1, 3))
-ggplot(index, aes(x = MOS11, y = D1, color = annee)) +
-  geom_point(size = 2) +
-  labs(title = "D1 en fonction de MOS11",
-       x = "MOS11",
-       y = "D1") +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-
-ggplot(index, aes(x = MOS11, y = D2, color = annee)) +
-  geom_point(size = 2) +
-  labs(title = "D1 en fonction de MOS11",
-       x = "MOS11",
-       y = "D1") +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-
-ggplot(index, aes(x = MOS11, y = D3, color = annee)) +
-  geom_point(size = 2) +
-  labs(title = "D1 en fonction de MOS11",
-       x = "MOS11",
-       y = "D1") +
-  theme_minimal() +
-  theme(legend.position = "bottom")
 ```
 
 ```{r}
@@ -418,6 +421,8 @@ leaflet(data = coordinates) %>%
   addPopupGraphs(p, width = 200, height = 200, group = "pnt")
 ```
 
+Voici à quoi ressemble la carte interactive qui montre les régimes alimentaires majoritaires principaux en fonction de chaque maille.
+
 <!--
   ```{r}
   denombrement$Nidification <- rep(NA, nrow(denombrement))
@@ -427,7 +432,6 @@ leaflet(data = coordinates) %>%
     } else {
       denombrement$Nidification[i] <-
         alimentation$Nidification[which(alimentation$Nom.latin == denombrement$latin[i])]
-    }
   }
   denombrement$Nidification <- as.factor(denombrement$Nidification)
 
@@ -473,6 +477,8 @@ leaflet(data = coordinates) %>%
     addPopupGraphs(p, width = 200, height = 200, group = "pnt")
   ```
 -->
+
+# Pey-PeyBerland
 
 ```{r}
 # Maintenant on va faire un datframe qui calcule les distances de toues les stations code_maille avec le centre ville, en considérant que le centre ville est PeyBerland
@@ -528,6 +534,9 @@ for (i in 1:nrow(index)) {
 }
 
 par(mfrow = c(1, 3))
+```
+
+```{r}
 ggplot(index, aes(x = Distance, y = D1, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
@@ -536,7 +545,9 @@ ggplot(index, aes(x = Distance, y = D1, color = as.factor(annee))) +
        y = "D1") +
   theme_minimal() +
   theme(legend.position = "bottom")
+```
 
+```{r}
 ggplot(index, aes(x = Distance, y = D2, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
@@ -545,7 +556,9 @@ ggplot(index, aes(x = Distance, y = D2, color = as.factor(annee))) +
        y = "D2") +
   theme_minimal() +
   theme(legend.position = "bottom")
+```
 
+```{r}
 ggplot(index, aes(x = Distance, y = D3, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
@@ -556,6 +569,7 @@ ggplot(index, aes(x = Distance, y = D3, color = as.factor(annee))) +
   theme(legend.position = "bottom")
 ```
 
+
 # ACP
 
 ```{r}
@@ -565,7 +579,9 @@ fviz_eig(
   addlabels = TRUE,
   ncp = 14
 )
+```
 
+```{r}
 fviz_pca_var(
   pca_result,
   col.var = "contrib",
@@ -573,12 +589,13 @@ fviz_pca_var(
   legend.title = "Contribution (%)",
   repel = TRUE
 )
+```
 
+```{r}
 fviz_pca_ind(
   pca_result,
   repel = FALSE
 )
-
 fviz_pca_biplot(
   pca_result,
   repel = FALSE,

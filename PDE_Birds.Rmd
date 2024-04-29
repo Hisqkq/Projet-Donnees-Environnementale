@@ -721,7 +721,8 @@ C'est une espèce carnivore qui migre tardivement et fait son nid dans les buiss
 ### Sun Burst Plot
 
 Voici, ci-dessous le Sun Burst Plot intéractif.
-Vous pouvez cliquer sur les différentes années puis sur les différents Moss pour zoomer et obtenir plus d'informations sur la présence des espèces d'oiseaux dans un moss d'une année spécifique.
+Vous pouvez cliquer sur les différentes années puis sur les différents Moss pour zoomer et obtenir plus d'informations sur la présence des espèces d'oiseaux dans un moss d'une année spécifique. 
+La présence d'une espèce d'oiseau est calculée en fonction du nombre d'oiseaux observés dans une parcelle multiplié par le pourcentage du MOSS dans la parcelle. Les parcelles ont été filtré en ne gardant que celles avec un buffer size de 500.
 
 ```{r}
 # --- Load data ---

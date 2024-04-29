@@ -29,13 +29,25 @@ output:
 # Introduction
 
 
-Dans le cadre de notre projet de statistiques, nous devons travailler sur un jeu de données environnementales.
-Ce jeu de données est composé de plusieurs fichiers qui contiennent des informations sur les oiseaux, les stations de mesure, les traits des oiseaux, les sites de mesure, les régimes alimentaires des oiseaux, les statuts de l'IUCN et la biodiversité.
-Nous avons décidé de nous concentrer sur les oiseaux et les stations de mesure.
-Nous avons donc nettoyé les données, effectué des analyses exploratoires et des analyses multivariées pour mieux comprendre les relations entre les différentes variables.
-Nous avons également créé des cartes interactives pour visualiser les données.
+Dans le cadre de notre projet de statistiques, nous travaillerons sur un jeu de données environnementales.
+Ce jeu de données est composé de plusieurs fichiers qui contiennent des informations sur les oiseaux, les stations de mesure, les caractéristiques des oiseaux, leurs régimes alimentaires et la biodiversité.
 
-```{r setup, message=FALSE, echo=FALSE}
+Ce rapport a pour objectif de présenter les différentes analyses que nous avons réalisées sur ces données.
+Il est composé de trois parties principales dans lesquelles nous explorons les relations entre la diversité des espèces d'oiseaux, l'artificialisation des sols et la distance avec le centre-ville de Bordeaux.
+Nous avons également étudié les régimes alimentaires des oiseaux et les modes de nidification en fonction de certaines zones géographiques.
+
+Vous trouverez des cartes, des graphiques, des tableaux, un sankie plot ainsi qu'un sunburst plot qui nous permettront de découvrir la mesure de la biodiversité.
+
+L'ensemble de ces données sont tirées du travail des membres de l'INRAE unité BioGeCo et du bureau de télédetection I-sea.
+
+Vous trouverez de nombreux résultats comme plusieurs courbes de diversité révélant la baisse significative de diversité dans les lieux les plus artificialisés.
+Vous trouverez également l'entièreté de notre cheminement pour arriver à nos résultats statistiques, notamment concernant la distribution des espèces d'oiseaux observées en Gironde, mais aussi des statistiques multivariées et descriptives.
+
+Nous vous invitons à découvrir l'ensemble de nos analyses et à explorer les différentes visualisations que nous avons réalisées pour mieux comprendre les relations entre les différentes variables de notre jeu de données.
+Toutes nos visualisations sont interactives et vous permettent de zoomer, de déplacer et de cliquer sur les différents éléments pour obtenir plus d'informations.
+Cela vous permettra d'avoir une expérience plus immersive et vous permettra de créer vos propres analyses, en parallèle à celles réalisées par nos soins.
+
+```{r setup, message=FALSE, echo=FALSE, warning=FALSE}
 # Packages de gestion des données
 library(tidyverse)
 library(sf)
@@ -59,8 +71,14 @@ library(factoextra)
 knitr::opts_chunk$set(out.width = "100%", echo = TRUE)
 ```
 
-Pour commencer, nous allons charger les données et les explorer pour mieux comprendre leur structure.
-Dans un premier temps, nous allons ajouter une colonne à notre DataFrame qui contient les noms latins des oiseaux.
+
+
+
+# Exploration des données
+
+
+Pour commencer, nous chargeons les données et nous les explorons pour mieux comprendre leur structure.
+Dans un premier temps, nous allons ajouter une colonne à notre DataFrame qui contient les noms latins des oiseaux afin de facilliter les analyses par la suite.
 ```{r}
 oiseaux <- read.csv("data/birds/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
 # CRÉER UNE NOUVELLE COLONNE DANS LE DATAFRAME OISEAUX QUI CONTIENT LE NOM LATIN DE L'OISEAU
@@ -97,7 +115,7 @@ as.data.frame.matrix(table(oiseaux$latin, oiseaux$Annee))
 ```
 
 
-Dans cette partie, nous allons explorer la mesure de la diversité à travers différentes mesures.
+Dans cette partie, nous allons explorer la mesure de la diversité à à l'aide de plusieurs entropies.
 Nous nous intéresserons uniquement au MOS11, c'est à dire les surfaces artificialisées. On prend comme buffer size 500m.
 
 Dans un premier temps, nous allons utiliser la proportion d’espèces différentes observées dans une station pour mesurer la diversité. Dans un deuxième temps, nous allons utiliser l’entropie de Shannon et enfin l'indice de Simpson.
@@ -133,7 +151,7 @@ for (i in 1:nrow(index)) {
 }
 ```
 
-Voici le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliqué par la proportion d'espèces.
+Voici le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliquée par la proportion d'espèces.
 ```{r, message=FALSE, warning=FALSE, error=FALSE}
 ggplot(index, aes(x = MOS11, y = D1, color = as.factor(annee))) +
   geom_point(size = 2) +
@@ -146,7 +164,7 @@ ggplot(index, aes(x = MOS11, y = D1, color = as.factor(annee))) +
   theme(legend.position = "bottom")
 ```
 
-Ceci est le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliqué par l'entropie de Shannon.
+Ceci est le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliquée par l'entropie de Shannon.
 ```{r, message=FALSE, warning=FALSE, error=FALSE}
 ggplot(index, aes(x = MOS11, y = D2, color = as.factor(annee))) +
   geom_point(size = 2) +
@@ -159,7 +177,7 @@ ggplot(index, aes(x = MOS11, y = D2, color = as.factor(annee))) +
   theme(legend.position = "bottom")
 ```
 
-Ceci est le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliqué par l'indice de Simpson.
+Ceci est le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliquée par l'indice de Simpson.
 ```{r, message=FALSE, warning=FALSE, error=FALSE}
 ggplot(index, aes(x = MOS11, y = D3, color = as.factor(annee))) +
   geom_point(size = 2) +
@@ -174,9 +192,12 @@ ggplot(index, aes(x = MOS11, y = D3, color = as.factor(annee))) +
 
 La tendance globale est l'augmentation de la diversité au début de la courbe jusqu'à atteindre un maximum puis une baisse quand le MOS11 augmente davantage. C'est-à-dire que, moins les sols sont artificialisés, plus la diversité est grande avec une diversité maximale atteinte quand le milieu est à la fois artificialisé mais présente également des surfaces non artificialisées. 
 
-On peut aussi essayer d'observer cette tendance de diversité par rapport à la distance de la maille avec le centre ville. Pour ce faire, nous allons calculer toutes les distances de chaque maille à PeyBerland, qui sera notre point référent pour le centre. 
 
-# Pey-PeyBerland
+Notre deuxième partie se portera sur l'analyse de la diversité des espèces d'oiseaux en fonction de la distance avec le centre-ville de Bordeaux.
+On observera une tendance de diversité par rapport à la distance de la maille avec le centre ville qui diffère légèrement par rapport aux résultats ci-dessus.
+Pour ce faire, nous allons calculer toutes les distances de chaque maille à PeyBerland, qui sera notre point référent pour le centre. 
+
+# Tendance de diversité par rapport à la distance avec le centre-ville
 
 ```{r}
 PeyBerland <- data.frame("Latitude" = 44.838168, "Longitude" = -0.578803)
@@ -209,7 +230,9 @@ for (i in 1:nrow(index)) {
 par(mfrow = c(1, 3))
 ```
 
+Pour faire l'analyse, on utilise les trois mesures de diversité que nous avons utilisées précédemment.
 
+Voici la courbe de diversité expliquée par la proportion d'espèces.
 ```{r}
 ggplot(index, aes(x = Distance, y = D1, color = as.factor(annee))) +
   geom_point(size = 2) +
@@ -221,6 +244,8 @@ ggplot(index, aes(x = Distance, y = D1, color = as.factor(annee))) +
   theme(legend.position = "bottom")
 ```
 
+
+Voici la courbe de diversité expliquée par l'entropie de Shannon.
 ```{r}
 ggplot(index, aes(x = Distance, y = D2, color = as.factor(annee))) +
   geom_point(size = 2) +
@@ -232,6 +257,7 @@ ggplot(index, aes(x = Distance, y = D2, color = as.factor(annee))) +
   theme(legend.position = "bottom")
 ```
 
+Voici la courbe de diversité expliquée par l'indice de Simpson.
 ```{r}
 ggplot(index, aes(x = Distance, y = D3, color = as.factor(annee))) +
   geom_point(size = 2) +
@@ -277,7 +303,8 @@ only_latin <- my_split(as.vector(oiseaux$Nom_Taxon_Cite))
 oiseaux$latin <- only_latin
 ```
 
-On affiche le tableau qui représente le MOS11 pour chaque station de mesure.
+Voici le tableau qui représente le MOS11 pour chaque station de mesure.
+Cette mesure nous indique à quel point le sol est artificialisé.
 ```{r}
 # CRÉER UNE NOUVELLE COLONNE DANS LE DATAFRAME OISEAUX QUI CONTIENT LA VALEUR MOS11 DU POINT
 filter <- LUP$BufferSize == 500
@@ -295,10 +322,10 @@ oiseaux$MOS11 <- LUP_500_MOS11$MOS11[MOS11]
 ```
 
 
-# On fait la carte
+# Analyses intéractives et géographiques
 
 
-```{r}
+```{r, warning=FALSE}
 traits <- read.csv("data/birds/traits-statut-IUCN-biodivercite.csv", header = TRUE)
 cite <- read.csv("data/birds/BiodiverCite_sites.csv", header = TRUE, sep = ";")
 
@@ -342,10 +369,14 @@ denombrementCarte <- denombrementCarte %>%
 denombrementCarte
 
 ```
-Grâce à ce tableau, nous pouvons voir comment les données sont structurées et remarquer notamment qu'il classe le nombre d'oiseaux par maille et par année. (tableau peut-être trop grand pour le rendu)
+Grâce à ce tableau, nous pouvons voir comment les données sont structurées et remarquer notamment qu'il classe le nombre d'oiseaux par maille et par année.
 
+
+Dans la suite de ce rapport vous trouverez des analyses géographiques et interactives qui vous permettront de visualiser comment les oiseaux de la Gironde évoluent en fonction de l'artificialisation des sols.
+Vous y trouverez des analyses sur les régimes alimentaires des oiseaux, les niveaux de spécialisation des oiseaux en fonction de leur habitat (Maille).
 
 Voici la carte interactive qui montre les mailles de mesure et les oiseaux les plus observés dans chaque maille.
+Nous vous invitons à cliquer sur les cercles pour obtenir toutes les informations sur les oiseaux.
 ```{r}
 # On garder que les colonnes qui nous intéressent, cad code_site et Nom_lieu
 cite <- cite %>%
@@ -566,7 +597,7 @@ En périphérie, les modes de nidification semblent plus diversifiés, avec une 
 
 
 
-# ACP
+# Analyse en Composante Principale (ACP)
 
 ```{r}
 pca_result <- PCA(LUP[, 6:19], scale.unit = TRUE, graph = FALSE)

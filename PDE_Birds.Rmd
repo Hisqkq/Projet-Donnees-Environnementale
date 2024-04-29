@@ -833,7 +833,7 @@ Ensuite, nous avons étudié la relation entre la diversité des espèces d'oise
 
 Par la suite, nous avons essayé de trouver des liens entre la diversité des espèces d'oiseaux et d'autres caractéristiques telles que les régimes alimentaires, les niveaux de spécialisation et les modes de nidification.
 
-Pour les niveaux de spécialisation, nous avons observé que les oiseaux de type Bâti sont plus répandus dans les zones urbaines, tandis que les oiseaux de type Forêt et Agricole sont plus fréquents en périphérie. Il y aussi de nombreuses espèces de type Zone humide près des points d'eau. Il y a de nombreuses espèces généralistes au centre-ville et en périphérie. Ces observations suggèrent que les oiseaux s'adaptent à leur environnement et que la diversité des espèces est influencée par les caractéristiques des habitats.
+Pour les niveaux de spécialisation, nous avons observé que les oiseaux de type Bâti sont plus répandus dans les zones urbaines, tandis que les oiseaux de type Forêt et Agricole sont plus fréquents en périphérie. Il y aussi de nombreuses espèces de type Zone humide près des points d'eau. Il y a de nombreuses espèces généralistes au centre-ville et en périphérie. Ces observations suggèrent  que la diversité des espèces est influencée par les caractéristiques des habitats.
 
 Nous avons également étudié les régimes alimentaires des oiseaux et avons constaté que le régime alimentaire de l'oiseau ne semble pas être impacté par l'artificialisation des sols. Cette observation suggère que les oiseaux sont capables de s'adapter à leur environnement et de trouver de la nourriture même dans les zones urbaines.
 

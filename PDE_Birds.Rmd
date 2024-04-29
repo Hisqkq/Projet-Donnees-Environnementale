@@ -64,18 +64,10 @@ library(leaflet)
 library(leafpop)
 library(leaflet.extras)
 
-#ACP
-library(FactoMineR)
-library(factoextra)
-
 knitr::opts_chunk$set(out.width = "100%", echo = TRUE)
 ```
 
-
-
-
 # Exploration des données
-
 
 Pour commencer, nous chargeons les données et nous les explorons pour mieux comprendre leur structure.
 Dans un premier temps, nous allons ajouter une colonne à notre DataFrame qui contient les noms latins des oiseaux afin de facilliter les analyses par la suite.
@@ -114,6 +106,7 @@ oiseaux$Annee <- as.factor(Annee)
 as.data.frame.matrix(table(oiseaux$latin, oiseaux$Annee))
 ```
 
+### Mesure de la diversité {.tabset}
 
 Dans cette partie, nous allons explorer la mesure de la diversité à à l'aide de plusieurs entropies.
 Nous nous intéresserons uniquement au MOS11, c'est à dire les surfaces artificialisées. On prend comme buffer size 500m.
@@ -151,18 +144,22 @@ for (i in 1:nrow(index)) {
 }
 ```
 
+#### Proportion d'espèces
+
 Voici le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliquée par la proportion d'espèces.
 ```{r, message=FALSE, warning=FALSE, error=FALSE}
 ggplot(index, aes(x = MOS11, y = D1, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
-  labs(title = " Proportion d’espèces en fonction de MOS11",
+  labs(title = "Proportion d’espèces en fonction de MOS11",
        x = "MOS11",
-       y = "Nombre d\'espèces") +
+       y = "Proportion d'espèces") +
   theme_minimal() +
   labs(colour = "Année") +
   theme(legend.position = "bottom")
 ```
+
+#### Indice de Shanon
 
 Ceci est le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliquée par l'entropie de Shannon.
 ```{r, message=FALSE, warning=FALSE, error=FALSE}
@@ -177,6 +174,8 @@ ggplot(index, aes(x = MOS11, y = D2, color = as.factor(annee))) +
   theme(legend.position = "bottom")
 ```
 
+#### Indice de Simpson
+
 Ceci est le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliquée par l'indice de Simpson.
 ```{r, message=FALSE, warning=FALSE, error=FALSE}
 ggplot(index, aes(x = MOS11, y = D3, color = as.factor(annee))) +
@@ -189,6 +188,8 @@ ggplot(index, aes(x = MOS11, y = D3, color = as.factor(annee))) +
   labs(colour = "Année") +
   theme(legend.position = "bottom")
 ```
+
+###
 
 La tendance globale est l'augmentation de la diversité au début de la courbe jusqu'à atteindre un maximum puis une baisse quand le MOS11 augmente davantage. C'est-à-dire que, moins les sols sont artificialisés, plus la diversité est grande avec une diversité maximale atteinte quand le milieu est à la fois artificialisé mais présente également des surfaces non artificialisées. 
 
@@ -232,42 +233,54 @@ par(mfrow = c(1, 3))
 
 Pour faire l'analyse, on utilise les trois mesures de diversité que nous avons utilisées précédemment.
 
+### Mesure de la diversité {.tabset}
+
+#### Proportion d'espèces
+
 Voici la courbe de diversité expliquée par la proportion d'espèces.
 ```{r, message=FALSE, warning=FALSE, error=FALSE}
 ggplot(index, aes(x = Distance, y = D1, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
-  labs(title = "D1 en fonction de la distance au centre-ville",
+  labs(title = "Proportion d'espèces en fonction de la distance au centre-ville",
        x = "Distance",
-       y = "D1") +
+       y = "Proportion d'espèces") +
   theme_minimal() +
+  labs(colour = "Année") +
   theme(legend.position = "bottom")
 ```
 
+#### Indice de Shanon
 
 Voici la courbe de diversité expliquée par l'entropie de Shannon.
 ```{r, message=FALSE, warning=FALSE, error=FALSE}
 ggplot(index, aes(x = Distance, y = D2, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
-  labs(title = "D2 en fonction de la distance au centre-ville",
+  labs(title = "Indice de Shanon en fonction de la distance au centre-ville",
        x = "Distance",
-       y = "D2") +
+       y = "Indice de Shanon") +
   theme_minimal() +
+  labs(colour = "Année") +
   theme(legend.position = "bottom")
 ```
+
+#### Indice de Simpson
 
 Voici la courbe de diversité expliquée par l'indice de Simpson.
 ```{r, message=FALSE, warning=FALSE, error=FALSE}
 ggplot(index, aes(x = Distance, y = D3, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
-  labs(title = "D3 en fonction de la distance au centre-ville",
+  labs(title = "Indice de Simpson en fonction de la distance au centre-ville",
        x = "Distance",
-       y = "D3") +
+       y = "Indice de Simpson") +
   theme_minimal() +
+  labs(colour = "Année") +
   theme(legend.position = "bottom")
 ```
+
+###
 
 La tendance globale est l'augmentation de la diversité au début de la courbe jusqu'à atteindre un maximum puis une baisse quand la distance avec le centre-ville augmente davantage. Nous pouvons voir que pour nos trois mesures de diversité, le pic est atteint à environ 9km. La diversité est donc plus grande lorsque la maille se trouver à environ 9km du centre-ville.
 Nous retrouvons donc la même observation qu'avec la variable d'artificialisation des sols (MOSS11), car l'artificialisation des sols et la distance avec le centre ville sont positivement corrélées (peut-etre essayer de mesurer la correlation entre ces deux variables sur nos données)
@@ -321,9 +334,7 @@ for (i in 1:nrow(oiseaux)) {
 oiseaux$MOS11 <- LUP_500_MOS11$MOS11[MOS11]
 ```
 
-
 # Analyses intéractives et géographiques
-
 
 ```{r message=FALSE, warning=FALSE}
 oiseaux <- read.csv("data/birds/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
@@ -600,70 +611,17 @@ leaflet(data = coordinates) %>%
   addPopupGraphs(p, width = 200, height = 200, group = "pnt2")
 ```
 
-
 Cette carte illustre la répartition des types de nidification en fonction des zones géographiques. Il est observé que dans les zones centrales, la majorité des nids sont situés dans des cavités, ce qui peut être attribué à la densité élevée de bâtiments et à la rareté de la végétation en ville. Le mode de nidification au sol est le moins courant dans ces zones, probablement en raison de la faible probabilité de survie des oiseaux dans un environnement urbain avec un nid au sol.  
 
 En périphérie, les modes de nidification semblent plus diversifiés, avec une prédominance de la nidification en buisson. La nidification dans les arbres est également très répandue, et on retrouve aussi la nidification en cavité. Le fait de ne pas être situé directement au centre-ville semble offrir plus de possibilités de nidification, ce qui pourrait expliquer une plus grande diversité d'espèces si on s'éloigne légèrement du centre ville, grâce à une combinaison de bâtiments et de végétation offrant plus de choix pour la nidification.
-
-
-
-
-# Analyse en Composante Principale (ACP)
-
-```{r}
-pca_result <- PCA(LUP[, 6:19], scale.unit = TRUE, graph = FALSE)
-fviz_eig(
-  pca_result,
-  addlabels = TRUE,
-  ncp = 14
-)
-```
-
-```{r}
-fviz_pca_var(
-  pca_result,
-  col.var = "contrib",
-  gradient.cols = rainbow(5),
-  legend.title = "Contribution (%)",
-  repel = TRUE
-)
-```
-
-```{r}
-fviz_pca_ind(
-  pca_result,
-  repel = FALSE
-)
-fviz_pca_biplot(
-  pca_result,
-  repel = FALSE,
-  col.var = "#E50000"
-)
-```
 
 # Pour aller plus loin
 
 Cette section est dédiée à des analyses plus poussées qui pourraient être réalisées pour mieux comprendre les données et les relations entre les différentes variables.
 Vous trouverez un Parallel Coordinates Plot ainsi qu'un sun burst plot qui illustrent les caractéristiques des différentes espèces d'oiseaux.
 
-
 Voici, ci-dessous le Parallel Coordinates Plot intéractif.
 Vous pouvez cliquer sur les différentes espèces pour obtenir plus d'informations sur chacune d'elles.
-
-Exemple d'utilisation : 
-
-- Nous voulons savoir le régime alimentaire des oiseaux qui migrent. 
-Pour cela, il suffit de cliquer au niveau de "migrateur tardif" et de cliquer sur "Végétarien", "Mixte" ou "carnivore" pour obtenir les espèces d'oiseaux qui correspondent à ces critères.
-Ceci est très utile lorsqu'on veut comparer le nombre d'oiseau selon les caractéristiques choisies ou même simplement rechercher l'espèce qui correspond à certains critères que l'on veut étudier.
-Pour finir l'exemple, si on clique au niveau de "Migrateur tardif", on remarque qu'aucun oiseau n'est végétarien.
-De plus, on peut affiner notre sélection pour voir quelles espèces d'oiseaux sont des migrateurs tardifs et font leur nid dans les buissons.
-On clique ainsi sur buisson et on voit que l'espèce "Lanius collurio" correspond à ces critères.
-C'est une espèce carnivore qui migre tardivement et fait son nid dans les buissons qui a un niveau de spécialisation agricole et qui s'alimente en vol.
-
-
-<center>
-  ![Voici une image de la pie-grièche écorcheur (Lanius collurio), wikipedia](./image/lanius.jpg)
-</center>
 
 ```{r}
 # --- Load data ---
@@ -733,10 +691,23 @@ plot_ly(data.frame(), type = "parcoords", line = list(color = "blue"), height = 
   )
 ) %>% layout(
   title = "Caractéristiques des différentes espèces d'oiseaux",
-  margin = list(l = 140, r = 55)
+  margin = list(l = 140, r = 55, b = 0)
 )
 ```
 
+### Exemple d'utilisation :
+
+- Nous voulons savoir le régime alimentaire des oiseaux qui migrent. 
+Pour cela, il suffit de cliquer au niveau de "migrateur tardif" et de cliquer sur "Végétarien", "Mixte" ou "carnivore" pour obtenir les espèces d'oiseaux qui correspondent à ces critères.
+Ceci est très utile lorsqu'on veut comparer le nombre d'oiseau selon les caractéristiques choisies ou même simplement rechercher l'espèce qui correspond à certains critères que l'on veut étudier.
+Pour finir l'exemple, si on clique au niveau de "Migrateur tardif", on remarque qu'aucun oiseau n'est végétarien.
+De plus, on peut affiner notre sélection pour voir quelles espèces d'oiseaux sont des migrateurs tardifs et font leur nid dans les buissons.
+On clique ainsi sur buisson et on voit que l'espèce "Lanius collurio" correspond à ces critères.
+C'est une espèce carnivore qui migre tardivement et fait son nid dans les buissons qui a un niveau de spécialisation agricole et qui s'alimente en vol.
+
+<center>
+  ![Voici une image de la pie-grièche écorcheur (Lanius collurio), wikipedia](https://upload.wikimedia.org/wikipedia/commons/b/b0/Lanius_collurio_5.jpg)
+</center>
 
 ```{r}
 # --- Load data ---
@@ -801,6 +772,8 @@ ids <- ids[is_nan_values]
 labels <- labels[is_nan_values]
 parents <- parents[is_nan_values]
 values <- values[is_nan_values]
+
+# --- Sunburst display ---
 
 plot_ly(
   ids = ids,

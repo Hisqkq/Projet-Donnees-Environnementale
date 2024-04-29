@@ -649,10 +649,10 @@ LUP
 # Pour aller plus loin
 
 Cette section est dédiée à des analyses plus poussées qui pourraient être réalisées pour mieux comprendre les données et les relations entre les différentes variables.
-Vous trouverez un sankie plot ainsi qu'un sun burst plot qui illustrent les caractéristiques des différentes espèces d'oiseaux.
+Vous trouverez un Parallel Coordinates Plot ainsi qu'un sun burst plot qui illustrent les caractéristiques des différentes espèces d'oiseaux.
 
 
-Voici, ci-dessous le sankie plot intéractif.
+Voici, ci-dessous le Parallel Coordinates Plot intéractif.
 Vous pouvez cliquer sur les différentes espèces pour obtenir plus d'informations sur chacune d'elles.
 
 Exemple d'utilisation : 

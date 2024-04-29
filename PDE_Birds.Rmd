@@ -801,7 +801,6 @@ ids <- ids[is_nan_values]
 labels <- labels[is_nan_values]
 parents <- parents[is_nan_values]
 values <- values[is_nan_values]
-```
 
 plot_ly(
   ids = ids,
@@ -812,7 +811,8 @@ plot_ly(
   branchvalues = "total",
   maxdepth = 2,
   insidetextorientation = "radial",
-  hoverinfo = "label+percent entry"
+  hoverinfo = "label+percent entry",
+  height = 800
 ) %>% layout(
   title = list(
     text = "Proportion des espèces d'oiseaux les plus couramment observées<br>en fonction de l'année et du MOS",

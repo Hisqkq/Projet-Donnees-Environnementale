@@ -292,7 +292,7 @@ ggplot(index, aes(x = Distance, y = D3, color = as.factor(annee))) +
 ###
 
 La tendance globale est l'augmentation de la diversité au début de la courbe jusqu'à atteindre un maximum puis une baisse quand la distance avec le centre-ville augmente davantage. Nous pouvons voir que pour nos trois mesures de diversité, le pic est atteint à environ 9km. La diversité est donc plus grande lorsque la maille se trouver à environ 9km du centre-ville.
-Nous retrouvons donc la même observation qu'avec la variable d'artificialisation des sols (MOSS11), car l'artificialisation des sols et la distance avec le centre ville sont positivement corrélées (peut-etre essayer de mesurer la correlation entre ces deux variables sur nos données)
+Nous retrouvons donc la même observation qu'avec la variable d'artificialisation des sols (MOS11), car l'artificialisation des sols et la distance avec le centre ville sont positivement corrélées (peut-etre essayer de mesurer la correlation entre ces deux variables sur nos données)
 
 
 Par la suite, l'objectif va être de comprendre pourquoi ce pic de diversité des espèces est observé à ce pourcentage d'artificialisation. Pour ce faire, nous allons introduire un nouveau jeu de données sur les caractéristiques des espèces d'oiseaux.
@@ -721,8 +721,8 @@ C'est une espèce carnivore qui migre tardivement et fait son nid dans les buiss
 ### Sun Burst Plot
 
 Voici, ci-dessous le Sun Burst Plot intéractif.
-Vous pouvez cliquer sur les différentes années puis sur les différents MOS pour zoomer et obtenir plus d'informations sur la présence des espèces d'oiseaux dans un moss d'une année spécifique. 
-La présence d'une espèce d'oiseau dans un MOSS est calculée en fonction du nombre d'oiseaux observés dans une parcelle multiplié par le pourcentage du MOS en question dans la parcelle. Les parcelles ont été filtré en ne gardant que celles avec un buffer size de 500.
+Vous pouvez cliquer sur les différentes années puis sur les différents MOS pour zoomer et obtenir plus d'informations sur la présence des espèces d'oiseaux dans un MOS d'une année spécifique. 
+La présence d'une espèce d'oiseau dans un MOS est calculée en fonction du nombre d'oiseaux observés dans une parcelle multiplié par le pourcentage du MOS en question dans la parcelle. Les parcelles ont été filtré en ne gardant que celles avec un buffer size de 500.
 
 ```{r}
 # --- Load data ---
@@ -814,12 +814,12 @@ plot_ly(
 
 - Nous voulons savoir quels espèces d'oiseaux étaient présentes dans le MOS 11 en 2023. 
 Pour cela, il suffit de cliquer au niveau de "2023" et de cliquer ensuite sur "MOS11" pour obtenir les espèces d'oiseaux présentent.
-Ceci est très utile lorsqu'on veut étudier la répartition des espèces d'oiseau ou regarder la présence d'une espèce dans un MOSS et une année que l'on veut étudier. On peut aussi
+Ceci est très utile lorsqu'on veut étudier la répartition des espèces d'oiseau ou regarder la présence d'une espèce dans un MOS et une année que l'on veut étudier. On peut aussi
 Pour finir l'exemple, on remarque que l'espèce Passer Domesticus est la plus présente dans le MOS 11 en 2023, avec 13% des observations. On retrouve ensuite les espèces Sturnus vulgaris et Columba livia avec respectivement 11% et 8% des observations.
 Presque 1/4 des oiseaux observés dans le MOS 11 en 2023 ont une présence inférieure à 2%. Ce sont donc des espèces moins communes dans ce MOS.
 
 <center>
-  ![Zoom sur le Sunburst pour l'année 2023 et le Moss 11](./images/sunburst2023MOSS11.png)
+  ![Zoom sur le Sunburst pour l'année 2023 et le MOS 11](./images/sunburst2023MOS11.png)
 </center>
 
 

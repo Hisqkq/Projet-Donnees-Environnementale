@@ -814,3 +814,11 @@ Enfin, nous avons étudié les modes de nidification des oiseaux et avons consta
 Cette observation souligne l'importance de préserver et de restaurer les habitats naturels dans les zones urbaines pour maintenir la biodiversité.
 
 En conclusion, notre étude a permis de mettre en évidence l'importance de préserver et de restaurer les habitats naturels dans les zones urbaines pour maintenir la biodiversité des oiseaux. Nous avons constaté que les zones de transition entre les espaces urbains et ruraux sont des zones clés pour la diversité des espèces d'oiseaux. Nous avons également observé que les oiseaux sont capables de s'adapter à leur environnement et de trouver de la nourriture même dans les zones urbaines. Ces résultats soulignent l'importance de prendre en compte la biodiversité dans les politiques d'aménagement urbain et de préserver les habitats naturels pour maintenir la diversité des espèces d'oiseaux. En utilisant différentes mesures de diversité, nous avons pu confirmer ces résultats et renforcer la validité de notre étude.
+
+```{r}
+mos_table <- read.csv("data/birds/themes_mos_gir.txt", header = TRUE, sep = "\t")
+mos_table <- mos_table[, c("ID", "MOS")]
+mos_table["ID"] <- paste0("MOS", mos_table[, "ID"])
+
+mos_table
+```

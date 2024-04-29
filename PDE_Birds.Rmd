@@ -3,9 +3,6 @@ title: "Projet stat pour données environnementales"
 author: "Alexandre Leys, Baptiste Gerbouin, Hamad Tria, Louis Delignac, Théo Lavandier"
 date: "`r format(Sys.Date(), '%d %B, %Y')`"
 output:
-  pdf_document:
-    toc: yes
-    toc_depth: '2'
   html_document:
     code_folding: hide
     code_download: yes
@@ -15,6 +12,9 @@ output:
     toc: yes
     toc_float: yes
     toc_depth: 2
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
 ---
 
 <style>
@@ -811,13 +811,11 @@ plot_ly(
 
 ### Exemple d'utilisation :
 
-- Nous voulons savoir le régime alimentaire des oiseaux qui migrent. 
-Pour cela, il suffit de cliquer au niveau de "migrateur tardif" et de cliquer sur "Végétarien", "Mixte" ou "carnivore" pour obtenir les espèces d'oiseaux qui correspondent à ces critères.
-Ceci est très utile lorsqu'on veut comparer le nombre d'oiseau selon les caractéristiques choisies ou même simplement rechercher l'espèce qui correspond à certains critères que l'on veut étudier.
-Pour finir l'exemple, si on clique au niveau de "Migrateur tardif", on remarque qu'aucun oiseau n'est végétarien.
-De plus, on peut affiner notre sélection pour voir quelles espèces d'oiseaux sont des migrateurs tardifs et font leur nid dans les buissons.
-On clique ainsi sur buisson et on voit que l'espèce "Lanius collurio" correspond à ces critères.
-C'est une espèce carnivore qui migre tardivement et fait son nid dans les buissons qui a un niveau de spécialisation agricole et qui s'alimente en vol.
+- Nous voulons savoir quels espèces d'oiseaux étaient présentes dans le MOS 11 en 2023. 
+Pour cela, il suffit de cliquer au niveau de "2023" et de cliquer ensuite sur "MOS11" pour obtenir les espèces d'oiseaux présentent.
+Ceci est très utile lorsqu'on veut étudier la répartition des espèces d'oiseau ou regarder la présence d'une espèce dans un MOSS et une année que l'on veut étudier. On peut aussi
+Pour finir l'exemple, on remarque que l'espèce Passer Domesticus est la plus présente dans le MOS 11 en 2023, avec 13% des observations. On retrouve ensuite les espèces Sturnus vulgaris et Columba livia avec respectivement 11% et 8% des observations.
+Presque 1/4 des oiseaux observés dans le MOS 11 en 2023 ont une présence inférieure à 2%. Ce sont donc des espèces moins communes dans ce MOS.
 
 <center>
   ![Zoom sur le Sunburst pour l'année 2023 et le Moss 11](./images/sunburst2023MOSS11.png)

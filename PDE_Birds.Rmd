@@ -618,7 +618,9 @@ En périphérie, les modes de nidification semblent plus diversifiés, avec une 
 # Pour aller plus loin
 
 Cette section est dédiée à des analyses plus poussées qui pourraient être réalisées pour mieux comprendre les données et les relations entre les différentes variables.
-Vous trouverez un Parallel Coordinates Plot ainsi qu'un sun burst plot qui illustrent les caractéristiques des différentes espèces d'oiseaux.
+Vous trouverez un Parallel Coordinates Plot ainsi qu'un Sun Burst Plot qui illustrent les caractéristiques des différentes espèces d'oiseaux.
+
+### Parallel Coordinates Plot
 
 Voici, ci-dessous le Parallel Coordinates Plot intéractif.
 Vous pouvez cliquer sur les différentes espèces pour obtenir plus d'informations sur chacune d'elles.
@@ -709,6 +711,11 @@ C'est une espèce carnivore qui migre tardivement et fait son nid dans les buiss
   ![Voici une image de la pie-grièche écorcheur (Lanius collurio), wikipedia](https://upload.wikimedia.org/wikipedia/commons/b/b0/Lanius_collurio_5.jpg)
 </center>
 
+### Sun Burst Plot
+
+Voici, ci-dessous le Sun Burst Plot intéractif.
+Vous pouvez cliquer sur les différentes années puis sur les différents Moss pour zoomer et obtenir plus d'informations sur la présence des espèces d'oiseaux dans un moss d'une année spécifique.
+
 ```{r}
 # --- Load data ---
 
@@ -794,6 +801,22 @@ plot_ly(
   margin = list(t = 100)
 )
 ```
+
+### Exemple d'utilisation :
+
+- Nous voulons savoir le régime alimentaire des oiseaux qui migrent. 
+Pour cela, il suffit de cliquer au niveau de "migrateur tardif" et de cliquer sur "Végétarien", "Mixte" ou "carnivore" pour obtenir les espèces d'oiseaux qui correspondent à ces critères.
+Ceci est très utile lorsqu'on veut comparer le nombre d'oiseau selon les caractéristiques choisies ou même simplement rechercher l'espèce qui correspond à certains critères que l'on veut étudier.
+Pour finir l'exemple, si on clique au niveau de "Migrateur tardif", on remarque qu'aucun oiseau n'est végétarien.
+De plus, on peut affiner notre sélection pour voir quelles espèces d'oiseaux sont des migrateurs tardifs et font leur nid dans les buissons.
+On clique ainsi sur buisson et on voit que l'espèce "Lanius collurio" correspond à ces critères.
+C'est une espèce carnivore qui migre tardivement et fait son nid dans les buissons qui a un niveau de spécialisation agricole et qui s'alimente en vol.
+
+<center>
+  ![Zoom sur le Sunburst pour l'année 2023 et le Moss 11](./images/sunburst2023MOSS11.png)
+</center>
+
+
 
 # Conclusion
 

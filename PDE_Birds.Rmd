@@ -796,3 +796,21 @@ plot_ly(
 ```
 
 # Conclusion
+
+
+Après avoir mené une étude approfondie sur la diversité des oiseaux à Bordeaux et sa périphérie, nous avons pu faire plusieurs découvertes intéressantes en utilisant différentes mesures de diversité telles que la richesse spécifique, l'indice de Shannon et l'indice de Simpson.
+
+Tout d'abord, nous avons découvert que la diversité des espèces d'oiseaux est étroitement liée au niveau d'artificialisation des sols, mesuré par la variable MOS11. En effet, nous avons constaté que la diversité est plus élevée dans les zones où se mélangent espaces verts et zones urbanisées. Cette observation suggère que les zones urbaines qui préservent des espaces verts et des habitats naturels sont plus susceptibles d'accueillir une grande diversité d'espèces d'oiseaux.
+
+Ensuite, nous avons étudié la relation entre la diversité des espèces d'oiseaux et la distance au centre-ville. Nous avons constaté que la diversité est plus grande lorsque la maille se trouve à environ 9 km du centre-ville. Cette tendance s'explique en partie par le fait que les zones situées à cette distance du centre-ville sont souvent des zones de transition entre les espaces urbains et les espaces ruraux, offrant ainsi une variété d'habitats pour les oiseaux.
+
+Par la suite, nous avons essayé de trouver des liens entre la diversité des espèces d'oiseaux et d'autres caractéristiques telles que les régimes alimentaires, les niveaux de spécialisation et les modes de nidification.
+
+Pour les niveaux de spécialisation, nous avons observé que les oiseaux de type Bâti sont plus répandus dans les zones urbaines, tandis que les oiseaux de type Forêt et Agricole sont plus fréquents en périphérie. Il y aussi de nombreuses espèces de type Zone humide près des points d'eau. Il y a de nombreuses espèces généralistes au centre-ville et en périphérie. Ces observations suggèrent que les oiseaux s'adaptent à leur environnement et que la diversité des espèces est influencée par les caractéristiques des habitats.
+
+Nous avons également étudié les régimes alimentaires des oiseaux et avons constaté que le régime alimentaire de l'oiseau ne semble pas être impacté par l'artificialisation des sols. Cette observation suggère que les oiseaux sont capables de s'adapter à leur environnement et de trouver de la nourriture même dans les zones urbaines.
+
+Enfin, nous avons étudié les modes de nidification des oiseaux et avons constaté que les zones qui combinent à la fois végétation et bâtiments sont plus susceptibles d'accueillir des oiseaux avec des modes de nidification variés. Par exemple, les zones centrales sont propices à la nidification en cavité en raison de la densité élevée de bâtiments, tandis que les zones périphériques offrent plus de possibilités de nidification en buisson et dans les arbres.                                                                                     
+Cette observation souligne l'importance de préserver et de restaurer les habitats naturels dans les zones urbaines pour maintenir la biodiversité.
+
+En conclusion, notre étude a permis de mettre en évidence l'importance de préserver et de restaurer les habitats naturels dans les zones urbaines pour maintenir la biodiversité des oiseaux. Nous avons constaté que les zones de transition entre les espaces urbains et ruraux sont des zones clés pour la diversité des espèces d'oiseaux. Nous avons également observé que les oiseaux sont capables de s'adapter à leur environnement et de trouver de la nourriture même dans les zones urbaines. Ces résultats soulignent l'importance de prendre en compte la biodiversité dans les politiques d'aménagement urbain et de préserver les habitats naturels pour maintenir la diversité des espèces d'oiseaux. En utilisant différentes mesures de diversité, nous avons pu confirmer ces résultats et renforcer la validité de notre étude.

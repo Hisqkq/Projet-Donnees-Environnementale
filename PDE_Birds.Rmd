@@ -600,6 +600,8 @@ fviz_pca_biplot(
 ```
 
 ```{r}
+# --- Load data ---
+
 birds_info <- read.csv("data/birds/traits-statut-IUCN-biodivercite.csv", header = TRUE)
 birds_info <- birds_info[, c(
   "Nom.latin",
@@ -610,11 +612,8 @@ birds_info <- birds_info[, c(
   "Période.de.migration"
 )]
 
-denombrement
-LUP
-```
+# --- Parcoords data preparation ---
 
-```{r}
 unique_level <- unique(birds_info[, "Niveau.de.spécialisation"])
 unique_regime <- unique(birds_info[, "Régime.alimentaire"])
 unique_technique <- unique(birds_info[, "Technique.d.alimentation"])
@@ -673,6 +672,8 @@ plot_ly(data.frame(), type = "parcoords", line = list(color = "blue"), height = 
 ```
 
 ```{r}
+# --- Load data ---
+
 LUP <- read.csv("data/birds/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
 LUP <- LUP[, c(c("ID", "BufferSize"), paste0("MOS", 1:14))]
 
@@ -689,9 +690,9 @@ birds_obs <- birds_obs %>%
   summarise(Sum = sum(Denombrement_min), .groups = "drop")
 
 LUP_birds_obs <- merge(LUP, birds_obs, by = "ID")
-```
 
-```{r}
+# --- Sunburst data preparation ---
+
 unique_year <- unique(LUP_birds_obs[, "Year"])
 unique_year <- unique_year[order(unique_year)]
 
@@ -733,9 +734,9 @@ ids <- ids[is_nan_values]
 labels <- labels[is_nan_values]
 parents <- parents[is_nan_values]
 values <- values[is_nan_values]
-```
 
-```{r}
+# --- Plot Sunburst ---
+
 plot_ly(
   ids = ids,
   labels = labels,

@@ -29,13 +29,25 @@ output:
 # Introduction
 
 
-Dans le cadre de notre projet de statistiques, nous devons travailler sur un jeu de données environnementales.
-Ce jeu de données est composé de plusieurs fichiers qui contiennent des informations sur les oiseaux, les stations de mesure, les traits des oiseaux, les sites de mesure, les régimes alimentaires des oiseaux, les statuts de l'IUCN et la biodiversité.
-Nous avons décidé de nous concentrer sur les oiseaux et les stations de mesure.
-Nous avons donc nettoyé les données, effectué des analyses exploratoires et des analyses multivariées pour mieux comprendre les relations entre les différentes variables.
-Nous avons également créé des cartes interactives pour visualiser les données.
+Dans le cadre de notre projet de statistiques, nous travaillerons sur un jeu de données environnementales.
+Ce jeu de données est composé de plusieurs fichiers qui contiennent des informations sur les oiseaux, les stations de mesure, les caractéristiques des oiseaux, leurs régimes alimentaires et la biodiversité.
 
-```{r setup, message=FALSE, echo=FALSE}
+Ce rapport a pour objectif de présenter les différentes analyses que nous avons réalisées sur ces données.
+Il est composé de trois parties principales dans lesquelles nous explorons les relations entre la diversité des espèces d'oiseaux, l'artificialisation des sols et la distance avec le centre-ville de Bordeaux.
+Nous avons également étudié les régimes alimentaires des oiseaux et les modes de nidification en fonction de certaines zones géographiques.
+
+Vous trouverez des cartes, des graphiques, des tableaux, un sankie plot ainsi qu'un sunburst plot qui nous permettront de découvrir la mesure de la biodiversité.
+
+L'ensemble de ces données sont tirées du travail des membres de l'INRAE unité BioGeCo et du bureau de télédetection I-sea.
+
+Vous trouverez de nombreux résultats comme plusieurs courbes de diversité révélant la baisse significative de diversité dans les lieux les plus artificialisés.
+Vous trouverez également l'entièreté de notre cheminement pour arriver à nos résultats statistiques, notamment concernant la distribution des espèces d'oiseaux observées en Gironde, mais aussi des statistiques multivariées et descriptives.
+
+Nous vous invitons à découvrir l'ensemble de nos analyses et à explorer les différentes visualisations que nous avons réalisées pour mieux comprendre les relations entre les différentes variables de notre jeu de données.
+Toutes nos visualisations sont interactives et vous permettent de zoomer, de déplacer et de cliquer sur les différents éléments pour obtenir plus d'informations.
+Cela vous permettra d'avoir une expérience plus immersive et vous permettra de créer vos propres analyses, en parallèle à celles réalisées par nos soins.
+
+```{r setup, message=FALSE, echo=FALSE, warning=FALSE}
 # Packages de gestion des données
 library(tidyverse)
 library(sf)
@@ -59,8 +71,14 @@ library(factoextra)
 knitr::opts_chunk$set(out.width = "100%", echo = TRUE)
 ```
 
-Pour commencer, nous allons charger les données et les explorer pour mieux comprendre leur structure.
-Dans un premier temps, nous allons ajouter une colonne à notre DataFrame qui contient les noms latins des oiseaux.
+
+
+
+# Exploration des données
+
+
+Pour commencer, nous chargeons les données et nous les explorons pour mieux comprendre leur structure.
+Dans un premier temps, nous allons ajouter une colonne à notre DataFrame qui contient les noms latins des oiseaux afin de facilliter les analyses par la suite.
 ```{r}
 oiseaux <- read.csv("data/birds/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
 # CRÉER UNE NOUVELLE COLONNE DANS LE DATAFRAME OISEAUX QUI CONTIENT LE NOM LATIN DE L'OISEAU
@@ -97,7 +115,7 @@ as.data.frame.matrix(table(oiseaux$latin, oiseaux$Annee))
 ```
 
 
-Dans cette partie, nous allons explorer la mesure de la diversité à travers différentes mesures.
+Dans cette partie, nous allons explorer la mesure de la diversité à à l'aide de plusieurs entropies.
 Nous nous intéresserons uniquement au MOS11, c'est à dire les surfaces artificialisées. On prend comme buffer size 500m.
 
 Dans un premier temps, nous allons utiliser la proportion d’espèces différentes observées dans une station pour mesurer la diversité. Dans un deuxième temps, nous allons utiliser l’entropie de Shannon et enfin l'indice de Simpson.
@@ -133,7 +151,7 @@ for (i in 1:nrow(index)) {
 }
 ```
 
-Voici le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliqué par la proportion d'espèces.
+Voici le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliquée par la proportion d'espèces.
 ```{r, message=FALSE, warning=FALSE, error=FALSE}
 ggplot(index, aes(x = MOS11, y = D1, color = as.factor(annee))) +
   geom_point(size = 2) +
@@ -146,7 +164,7 @@ ggplot(index, aes(x = MOS11, y = D1, color = as.factor(annee))) +
   theme(legend.position = "bottom")
 ```
 
-Ceci est le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliqué par l'entropie de Shannon.
+Ceci est le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliquée par l'entropie de Shannon.
 ```{r, message=FALSE, warning=FALSE, error=FALSE}
 ggplot(index, aes(x = MOS11, y = D2, color = as.factor(annee))) +
   geom_point(size = 2) +
@@ -159,7 +177,7 @@ ggplot(index, aes(x = MOS11, y = D2, color = as.factor(annee))) +
   theme(legend.position = "bottom")
 ```
 
-Ceci est le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliqué par l'indice de Simpson.
+Ceci est le graphique qui montre la relation entre la diversité et MOS11 pour chaque année expliquée par l'indice de Simpson.
 ```{r, message=FALSE, warning=FALSE, error=FALSE}
 ggplot(index, aes(x = MOS11, y = D3, color = as.factor(annee))) +
   geom_point(size = 2) +
@@ -174,9 +192,12 @@ ggplot(index, aes(x = MOS11, y = D3, color = as.factor(annee))) +
 
 La tendance globale est l'augmentation de la diversité au début de la courbe jusqu'à atteindre un maximum puis une baisse quand le MOS11 augmente davantage. C'est-à-dire que, moins les sols sont artificialisés, plus la diversité est grande avec une diversité maximale atteinte quand le milieu est à la fois artificialisé mais présente également des surfaces non artificialisées. 
 
-On peut aussi essayer d'observer cette tendance de diversité par rapport à la distance de la maille avec le centre ville. Pour ce faire, nous allons calculer toutes les distances de chaque maille à PeyBerland, qui sera notre point référent pour le centre. 
 
-# Pey-PeyBerland
+Notre deuxième partie se portera sur l'analyse de la diversité des espèces d'oiseaux en fonction de la distance avec le centre-ville de Bordeaux.
+On observera une tendance de diversité par rapport à la distance de la maille avec le centre ville qui diffère légèrement par rapport aux résultats ci-dessus.
+Pour ce faire, nous allons calculer toutes les distances de chaque maille à PeyBerland, qui sera notre point référent pour le centre. 
+
+# Tendance de diversité par rapport à la distance avec le centre-ville
 
 ```{r}
 PeyBerland <- data.frame("Latitude" = 44.838168, "Longitude" = -0.578803)
@@ -209,8 +230,10 @@ for (i in 1:nrow(index)) {
 par(mfrow = c(1, 3))
 ```
 
+Pour faire l'analyse, on utilise les trois mesures de diversité que nous avons utilisées précédemment.
 
-```{r}
+Voici la courbe de diversité expliquée par la proportion d'espèces.
+```{r, message=FALSE, warning=FALSE, error=FALSE}
 ggplot(index, aes(x = Distance, y = D1, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
@@ -221,7 +244,9 @@ ggplot(index, aes(x = Distance, y = D1, color = as.factor(annee))) +
   theme(legend.position = "bottom")
 ```
 
-```{r}
+
+Voici la courbe de diversité expliquée par l'entropie de Shannon.
+```{r, message=FALSE, warning=FALSE, error=FALSE}
 ggplot(index, aes(x = Distance, y = D2, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
@@ -232,7 +257,8 @@ ggplot(index, aes(x = Distance, y = D2, color = as.factor(annee))) +
   theme(legend.position = "bottom")
 ```
 
-```{r}
+Voici la courbe de diversité expliquée par l'indice de Simpson.
+```{r, message=FALSE, warning=FALSE, error=FALSE}
 ggplot(index, aes(x = Distance, y = D3, color = as.factor(annee))) +
   geom_point(size = 2) +
   geom_smooth(method = "auto", se = TRUE, color = "black", alpha = 0.2) +
@@ -277,7 +303,8 @@ only_latin <- my_split(as.vector(oiseaux$Nom_Taxon_Cite))
 oiseaux$latin <- only_latin
 ```
 
-On affiche le tableau qui représente le MOS11 pour chaque station de mesure.
+Voici le tableau qui représente le MOS11 pour chaque station de mesure.
+Cette mesure nous indique à quel point le sol est artificialisé.
 ```{r}
 # CRÉER UNE NOUVELLE COLONNE DANS LE DATAFRAME OISEAUX QUI CONTIENT LA VALEUR MOS11 DU POINT
 filter <- LUP$BufferSize == 500
@@ -295,14 +322,58 @@ oiseaux$MOS11 <- LUP_500_MOS11$MOS11[MOS11]
 ```
 
 
-# On fait la carte
+# Analyses intéractives et géographiques
 
 
-```{r}
+```{r message=FALSE, warning=FALSE}
+oiseaux <- read.csv("data/birds/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
+# CREATE A NEW COLUMN IN THE OISEAUX DATAFRAME THAT CONTAINS THE LATIN NAME OF THE BIRD
+my_split <- function(array, str = " \\| ") {
+  out <- rep(NA, length(array))
+  for (i in 1:length(array)) {
+    out[i] <- unlist(strsplit(array[i], str))[1]
+  }
+  return (out)
+}
+
+only_latin <- my_split(as.vector(oiseaux$Nom_Taxon_Cite))
+# length(unique(only_latin)) == length(unique(oiseaux$Code_Ref))
+
+oiseaux$latin <- only_latin
+oiseaux$annee <- as.numeric(substr(oiseaux$Date, 1, 4))
+
+denombrement <- oiseaux %>%
+  group_by(Code_Maille, annee, latin) %>%
+  summarise(sum = sum(Denombrement_min, na.rm = TRUE), .groups = 'drop') %>%
+  arrange(desc(Code_Maille))
+
+denombrement$p <- rep(NA, nrow(denombrement))
+for (i in 1:nrow(denombrement)) {
+  numerator <- denombrement$sum[i]
+  denominator <- 
+    sum(denombrement$sum[which(denombrement$Code_Maille == denombrement$Code_Maille[i] 
+                               & denombrement$annee == denombrement$annee[i])])
+  denombrement$p[i] <- numerator / denominator
+}
+
+index <- denombrement %>%
+  group_by(Code_Maille, annee = factor(annee)) %>%
+  summarise(D1 = sum(p > 0, na.rm = TRUE), 
+            D2 = exp(-sum(p*log(p))), 
+            D3 = 1 / sum(p^2), .groups = 'drop') %>%
+  arrange(desc(Code_Maille))
+
+LUP <- read.csv("data/birds/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
+index$MOS11 <- rep(NA, nrow(index))
+for (i in 1:nrow(index)) {
+  index$MOS11[i] <- LUP$MOS11[which(index$Code_Maille[i] == LUP$ID & LUP$BufferSize == 1000)]
+}
+
+
 traits <- read.csv("data/birds/traits-statut-IUCN-biodivercite.csv", header = TRUE)
-cite <- read.csv("data/birds/BiodiverCite_sites.csv", header = TRUE, sep = ";")
+cite <- read.csv("data/birds/BiodiverCite_sites.csv", header = TRUE, sep=";")
 
-#on veut traiter la table dénombrement qu"on appelera denombrementCarte où il restera pour chaque maille et pour chaque année le top 3 des oiseaux les plus observés sans la variable p
+#on veut traiter la table dénombrement qu'on appelera denombrementCarte où il restera pour chaque maille et pour chaque année le top 3 des oiseaux les plus observés sans la variable p
 
 denombrementCarte <- denombrement %>%
   group_by(Code_Maille, annee) %>%
@@ -312,7 +383,7 @@ denombrementCarte <- denombrement %>%
   select(-p)
 
 
-#on veut changer cette table pour faire apparaitre de nouvelles colonnes pour qu"il y ait : une ligne par maille et par année, et pour chaque oiseau, le nombre d"individus observés
+#on veut changer cette table pour faire apparaitre de nouvelles colonnes pour qu'il y ait : une ligne par maille et par année, et pour chaque oiseau, le nombre d'individus observés
 
 denombrementCarte <- denombrementCarte %>%
   pivot_wider(names_from = latin, values_from = sum, values_fill = 0)
@@ -340,14 +411,19 @@ denombrementCarte <- denombrementCarte %>%
   filter(annee == 2023)
 
 denombrementCarte
-
 ```
-Grâce à ce tableau, nous pouvons voir comment les données sont structurées et remarquer notamment qu'il classe le nombre d'oiseaux par maille et par année. (tableau peut-être trop grand pour le rendu)
+Grâce à ce tableau, nous pouvons voir comment les données sont structurées et remarquer notamment qu'il classe le nombre d'oiseaux par maille et par année.
 
+
+Dans la suite de ce rapport vous trouverez des analyses géographiques et interactives qui vous permettront de visualiser comment les oiseaux de la Gironde évoluent en fonction de l'artificialisation des sols.
+Vous y trouverez des analyses sur les régimes alimentaires des oiseaux, les niveaux de spécialisation des oiseaux en fonction de leur habitat (Maille).
 
 Voici la carte interactive qui montre les mailles de mesure et les oiseaux les plus observés dans chaque maille.
-```{r}
+Nous vous invitons à cliquer sur les cercles pour obtenir toutes les informations sur les oiseaux.
+```{r message=FALSE, warning=FALSE}
 # On garder que les colonnes qui nous intéressent, cad code_site et Nom_lieu
+
+cite <- read.csv("data/birds/BiodiverCite_sites.csv", header = TRUE, sep=";")
 cite <- cite %>%
   select(code_site, Nom_lieu)
 
@@ -357,8 +433,8 @@ denombrementCarte <- left_join(denombrementCarte, cite, by = c("Code_Maille" = "
 
 # Créer une chaîne de caractères pour les popups avec le top trois des oiseaux ayant la plus grande valeur
 denombrementCarte$popup_text <- paste0("<strong>Maille:</strong> ", denombrementCarte$Nom_lieu, "<br>",
-                                       "<strong>Année:</strong> ", denombrementCarte$annee, "<br>",
-                                       "<strong>Top 3 des oiseaux:</strong>", "<br>")
+                                      "<strong>Année:</strong> ", denombrementCarte$annee, "<br>",
+                                      "<strong>Top 3 des oiseaux:</strong>", "<br>")
 
 dataframe <- as.data.frame(denombrementCarte)
 
@@ -397,166 +473,132 @@ Il nous semblait intéressant de savoir quels étaient les régimes alimentaires
 Nous avons donc créé un graphique qui montre la répartition des régimes alimentaires pour chaque maille.
 
 ```{r}
-oiseaux <- read.csv("data/birds/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
-my_split <- function(array, str = " \\| ") {
-  out <- rep(NA, length(array))
-  for (i in 1:length(array)) {
-    out[i] <- unlist(strsplit(array[i], str))[1]
-  }
-  return(out)
-}
-
-only_latin <- my_split(as.vector(oiseaux$Nom_Taxon_Cite))
-
-oiseaux$latin <- only_latin
-oiseaux$annee <- as.numeric(substr(oiseaux$Date, 1, 4))
-
-denombrement <- oiseaux %>%
-  group_by(Code_Maille, annee, latin) %>%
-  summarise(sum = sum(Denombrement_min, na.rm = TRUE), .groups = "drop") %>%
-  arrange(desc(Code_Maille))
-
-denombrement$p <- rep(NA, nrow(denombrement))
-for (i in 1:nrow(denombrement)) {
-  numerator <- denombrement$sum[i]
-  denominator <-
-    sum(denombrement$sum[which(denombrement$Code_Maille == denombrement$Code_Maille[i]
-                               & denombrement$annee == denombrement$annee[i])])
-  denombrement$p[i] <- numerator / denominator
-}
-
-index <- denombrement %>%
-  group_by(Code_Maille, annee = factor(annee)) %>%
-  summarise(D1 = sum(p > 0, na.rm = TRUE),
-            D2 = exp(-sum(p * log(p))),
-            D3 = 1 / sum(p^2), .groups = "drop") %>%
-  arrange(desc(Code_Maille))
-
-LUP <- read.csv("data/birds/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
-index$MOS11 <- rep(NA, nrow(index))
-for (i in 1:nrow(index)) {
-  index$MOS11[i] <- LUP$MOS11[which(index$Code_Maille[i] == LUP$ID & LUP$BufferSize == 500)]
-}
-```
-
-```{r}
 # changed the unmatchinng latin names to the correct ones to match alimentation
 denombrement$latin[denombrement$latin == "Carduelis chloris"] <- "Chloris chloris"
 denombrement$latin[denombrement$latin == "Carduelis spinus"] <- "Spinus spinus"
 denombrement$latin[denombrement$latin == "Casmerodius albus"] <- "Ardea alba"
 denombrement$latin[denombrement$latin == "Carduelis cannabina"] <- "Linaria cannabina"
-no_info <- c("Himantopus himantopus", "Tringa ochropus",
-             "Caprimulgus europaeus", "Lanius senator",
+no_info <- c("Himantopus himantopus", "Tringa ochropus", 
+             "Caprimulgus europaeus", "Lanius senator", 
              "Dryocopus martius", "Emberiza calandra")
 
 alimentation <- read.csv("data/birds/traits-statut-IUCN-biodivercite.csv", header = TRUE)
 denombrement$regime_alimentaire <- rep(NA, nrow(denombrement))
 for (i in 1:nrow(denombrement)) {
-  if (denombrement$latin[i] %in% no_info) {
+  if (denombrement$latin[i] %in% no_info){
     denombrement$regime_alimentaire[i] <- NA
-  } else {
-    denombrement$regime_alimentaire[i] <-
+  }
+  else {
+    denombrement$regime_alimentaire[i] <- 
       alimentation$Régime.alimentaire[which(alimentation$Nom.latin == denombrement$latin[i])]
   }
 }
 denombrement$regime_alimentaire <- as.factor(denombrement$regime_alimentaire)
 
-plot_data <- function(data, title) {
-  ggplot(data, aes(x = "", y = sum, fill = regime_alimentaire)) +
-    geom_bar(stat = "identity", width = 0.1) +
-    coord_polar("y", start = 0) +
+plot_data = function (data, title) {
+    ggplot(data, aes(x="", y=sum, fill=regime_alimentaire)) +
+    geom_bar(stat="identity", width=0.1) +
+    coord_polar("y", start=0) +
     ggtitle(paste("Station: ", as.character(title))) +
     theme_void()
 }
+
+cite <- cite %>%
+  select(code_site, Nom_lieu)
+
+#On join les deux tables cite et denombrementCarte
+
+denombrement <- left_join(denombrement, cite, by = c("Code_Maille" = "code_site"))
 
 N <- length(unique(denombrement$Code_Maille))
 p <- vector("list", length = N)
 
 for (i in 1:N) {
-  data <- denombrement[which(denombrement$Code_Maille == unique(denombrement$Code_Maille)[i]), ]
-  data <- data %>% group_by(regime_alimentaire) %>% summarise(sum = sum(p, na.rm = TRUE))
-  p[[i]] <- plot_data(data, unique(denombrement$Code_Maille)[i])
+    data <- denombrement[which(denombrement$Code_Maille == unique(denombrement$Code_Maille)[i]),]
+    data <- data %>% group_by(regime_alimentaire) %>% summarise(sum = sum(p, na.rm = TRUE))
+    p[[i]] <- plot_data(data, unique(denombrement$Nom_lieu)[i])
 }
 
 coordinates <- st_as_sf(LUP, coords = c("X", "Y"), crs = 2154)
 coordinates <- st_transform(coordinates, crs = 4326)
-coordinates <- coordinates[coordinates$BufferSize == 500, ]
+coordinates <- coordinates[coordinates$BufferSize == 500,]
 
 # Remove the coordinates that are not in denombrement
 for (i in seq_along(coordinates$ID)){
-  if (!(coordinates$ID[i] %in% unique(denombrement$Code_Maille))) {
-    coordinates <- coordinates[-i, ]
+  if (!(coordinates$ID[i] %in% unique(denombrement$Code_Maille))){
+    coordinates <- coordinates[-i,]
   }
 }
 
-coordinates <- coordinates[order(coordinates$ID, decreasing = TRUE), ]
+coordinates <- coordinates[order(coordinates$ID, decreasing = TRUE),]
 
 pal <- colorNumeric("viridis", domain = coordinates$MOS11)
 leaflet(data = coordinates) %>%
   addProviderTiles("CartoDB.Positron") %>%
-  addCircles(radius = 300, color = ~pal(MOS11),
+  addCircles(radius = 300, color = ~pal(MOS11), 
              fillOpacity = 0.5, group = "pnt") %>%
   addLegend("bottomright", pal = pal, values = coordinates$MOS11, title = "MOS11") %>%
-  addScaleBar(position = "bottomleft") %>%
+  addScaleBar(position = "bottomleft") %>% 
   addPopupGraphs(p, width = 200, height = 200, group = "pnt")
 ```
 
 Voici à quoi ressemble la carte interactive qui montre les régimes alimentaires majoritaires principaux en fonction de chaque maille. Nous pouvons voir qu'en général, le régime alimentaire dominant est le régime alimentaire mixte, que cela soit au centre de Bordeaux ou en périphérie. Il semble donc que le régime alimentaire de l'oiseau ne soit pas véritablement impacté par l'artificialisation des sols.
 Essayons maintenant d'étudier d'autre caratéristiques afin d'essayer de trouver des raisons à ce pic de diversité.
 
-
-  <!-- ```{r}
-  denombrement$Nidification <- rep(NA, nrow(denombrement))
-  for (i in 1:nrow(denombrement)) {
-    if (denombrement$latin[i] %in% no_info) {
-      denombrement$Nidification[i] <- NA
-    } else {
-      denombrement$Nidification[i] <-
-        alimentation$Nidification[which(alimentation$Nom.latin == denombrement$latin[i])]
+```{r}
+denombrement$Nidification <- rep(NA, nrow(denombrement))
+for (i in 1:nrow(denombrement)) {
+  if (denombrement$latin[i] %in% no_info){
+    denombrement$Nidification[i] <- NA
   }
-  denombrement$Nidification <- as.factor(denombrement$Nidification)
-
-  plot_data <- function(data, title) {
-    ggplot(data, aes(x = "", y = sum, fill = Nidification)) +
-      geom_bar(stat = "identity", width = 0.1) +
-      coord_polar("y", start = 0) +
-      ggtitle(paste("Station: ", as.character(title))) +
-      theme_void()
+  else {
+    denombrement$Nidification[i] <- 
+      alimentation$Nidification[which(alimentation$Nom.latin == denombrement$latin[i])]
   }
+}
+denombrement$Nidification <- as.factor(denombrement$Nidification)
 
-  #On join les deux tables cite et denombrementCarte
+plot_data = function (data, title) {
+    ggplot(data, aes(x="", y=sum, fill=Nidification)) +
+    geom_bar(stat="identity", width=0.1) +
+    coord_polar("y", start=0) +
+    ggtitle(paste("Station: ", as.character(title))) +
+    theme_void()
+}
 
-  N <- length(unique(denombrement$Code_Maille))
-  p <- vector("list", length = N)
+#On join les deux tables cite et denombrementCarte
 
-  for (i in 1:N) {
-    data <- denombrement[which(denombrement$Code_Maille == unique(denombrement$Code_Maille)[i]), ]
+N <- length(unique(denombrement$Code_Maille))
+p <- vector("list", length = N)
+
+for (i in 1:N) {
+    data <- denombrement[which(denombrement$Code_Maille == unique(denombrement$Code_Maille)[i]),]
     data <- data %>% group_by(Nidification) %>% summarise(sum = sum(p, na.rm = TRUE))
     p[[i]] <- plot_data(data, unique(denombrement$Nom_lieu)[i])
+}
+
+coordinates <- st_as_sf(LUP, coords = c("X", "Y"), crs = 2154)
+coordinates <- st_transform(coordinates, crs = 4326)
+coordinates <- coordinates[coordinates$BufferSize == 500,]
+
+# Remove the coordinates that are not in denombrement
+for (i in seq_along(coordinates$ID)){
+  if (!(coordinates$ID[i] %in% unique(denombrement$Code_Maille))){
+    coordinates <- coordinates[-i,]
   }
+}
 
-  coordinates <- st_as_sf(LUP, coords = c("X", "Y"), crs = 2154)
-  coordinates <- st_transform(coordinates, crs = 4326)
-  coordinates <- coordinates[coordinates$BufferSize == 500, ]
+coordinates <- coordinates[order(coordinates$ID, decreasing = TRUE),]
 
-  # Remove the coordinates that are not in denombrement
-  for (i in seq_along(coordinates$ID)){
-    if (!(coordinates$ID[i] %in% unique(denombrement$Code_Maille))) {
-      coordinates <- coordinates[-i, ]
-    }
-  }
-
-  coordinates <- coordinates[order(coordinates$ID, decreasing = TRUE), ]
-
-  pal <- colorNumeric("viridis", domain = coordinates$MOS11)
-  leaflet(data = coordinates) %>%
-    addProviderTiles("CartoDB.Positron") %>%
-    addCircles(radius = 300, color = ~pal(MOS11),
-              fillOpacity = 0.5, group = "pnt") %>%
-    addLegend("bottomright", pal = pal, values = coordinates$MOS11, title = "MOS11") %>%
-    addScaleBar(position = "bottomleft") %>%
-    addPopupGraphs(p, width = 200, height = 200, group = "pnt")
-  ``` -->
+pal <- colorNumeric("viridis", domain = coordinates$MOS11)
+leaflet(data = coordinates) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addCircles(radius = 300, color = ~pal(MOS11), 
+             fillOpacity = 0.5, group = "pnt2") %>%
+  addLegend("bottomright", pal = pal, values = coordinates$MOS11, title = "MOS11") %>%
+  addScaleBar(position = "bottomleft") %>% 
+  addPopupGraphs(p, width = 200, height = 200, group = "pnt2")
+```
 
 
 Cette carte illustre la répartition des types de nidification en fonction des zones géographiques. Il est observé que dans les zones centrales, la majorité des nids sont situés dans des cavités, ce qui peut être attribué à la densité élevée de bâtiments et à la rareté de la végétation en ville. Le mode de nidification au sol est le moins courant dans ces zones, probablement en raison de la faible probabilité de survie des oiseaux dans un environnement urbain avec un nid au sol.  
@@ -566,7 +608,7 @@ En périphérie, les modes de nidification semblent plus diversifiés, avec une 
 
 
 
-# ACP
+# Analyse en Composante Principale (ACP)
 
 ```{r}
 pca_result <- PCA(LUP[, 6:19], scale.unit = TRUE, graph = FALSE)
@@ -598,6 +640,30 @@ fviz_pca_biplot(
   col.var = "#E50000"
 )
 ```
+
+# Pour aller plus loin
+
+Cette section est dédiée à des analyses plus poussées qui pourraient être réalisées pour mieux comprendre les données et les relations entre les différentes variables.
+Vous trouverez un Parallel Coordinates Plot ainsi qu'un sun burst plot qui illustrent les caractéristiques des différentes espèces d'oiseaux.
+
+
+Voici, ci-dessous le Parallel Coordinates Plot intéractif.
+Vous pouvez cliquer sur les différentes espèces pour obtenir plus d'informations sur chacune d'elles.
+
+Exemple d'utilisation : 
+
+- Nous voulons savoir le régime alimentaire des oiseaux qui migrent. 
+Pour cela, il suffit de cliquer au niveau de "migrateur tardif" et de cliquer sur "Végétarien", "Mixte" ou "carnivore" pour obtenir les espèces d'oiseaux qui correspondent à ces critères.
+Ceci est très utile lorsqu'on veut comparer le nombre d'oiseau selon les caractéristiques choisies ou même simplement rechercher l'espèce qui correspond à certains critères que l'on veut étudier.
+Pour finir l'exemple, si on clique au niveau de "Migrateur tardif", on remarque qu'aucun oiseau n'est végétarien.
+De plus, on peut affiner notre sélection pour voir quelles espèces d'oiseaux sont des migrateurs tardifs et font leur nid dans les buissons.
+On clique ainsi sur buisson et on voit que l'espèce "Lanius collurio" correspond à ces critères.
+C'est une espèce carnivore qui migre tardivement et fait son nid dans les buissons qui a un niveau de spécialisation agricole et qui s'alimente en vol.
+
+
+<center>
+  ![Voici une image de la pie-grièche écorcheur (Lanius collurio), wikipedia](./image/lanius.jpg)
+</center>
 
 ```{r}
 # --- Load data ---
@@ -671,6 +737,7 @@ plot_ly(data.frame(), type = "parcoords", line = list(color = "blue"), height = 
 )
 ```
 
+
 ```{r}
 # --- Load data ---
 
@@ -734,8 +801,7 @@ ids <- ids[is_nan_values]
 labels <- labels[is_nan_values]
 parents <- parents[is_nan_values]
 values <- values[is_nan_values]
-
-# --- Plot Sunburst ---
+```
 
 plot_ly(
   ids = ids,
@@ -755,3 +821,5 @@ plot_ly(
   margin = list(t = 100)
 )
 ```
+
+# Conclusion

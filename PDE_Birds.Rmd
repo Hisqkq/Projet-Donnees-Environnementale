@@ -3,21 +3,18 @@ title: "Projet stat pour données environnementales"
 author: "Alexandre Leys, Baptiste Gerbouin, Hamad Tria, Louis Delignac, Théo Lavandier"
 date: "`r format(Sys.Date(), '%d %B, %Y')`"
 output:
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
   html_document:
     code_folding: hide
-    code_download: true
+    code_download: yes
     theme: united
     highlight: tango
     df_print: paged
-    toc: true
-    toc_float: true
+    toc: yes
+    toc_float: yes
     toc_depth: 2
-  # pdf_document:
-  #   toc: true
-  #   toc_depth: 2
-  #   number_sections: true
-  #   df_print: kable
-  #   highlight: tango
 ---
 
 <style>
